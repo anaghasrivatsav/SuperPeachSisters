@@ -109,7 +109,37 @@ public:
     // hit points
     //
 
- 
+//Enemies
+ class Enemy:public Actor
+{
+public:
+    Enemy( int startX, int startY, StudentWorld* world, int imageID, int direction);
+    ~Enemy();
+    void doSomething();
+    void bonk();
+
+
+};
+
+class Goomba:public Enemy
+{
+public:
+    Goomba( int startX, int startY, StudentWorld* world);
+    ~Goomba();
+    void doSomething();
+    void bonk();
+    
+};
+
+class Koopa:public Enemy
+{
+public:
+    Koopa( int startX, int startY, StudentWorld* world);
+    ~Koopa();
+    void doSomething();
+    void bonk();
+    
+};
 
 
 // keep track of attributes of each of these objects

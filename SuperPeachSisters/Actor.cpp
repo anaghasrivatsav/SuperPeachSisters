@@ -16,6 +16,7 @@ private:
  bool m_canDamage;*/
 
 
+//ACTOR CLASS
 Actor::Actor( bool status, bool canBeDamaged, bool canShareSpace, int imageID, int startX ,int startY, int direction, int depth, double size, StudentWorld* world): GraphObject( imageID,  startX,  startY, direction, depth, size)
 {
     m_status= status;
@@ -60,6 +61,38 @@ StudentWorld* Actor::getWorld( )
 }
 
 
+
+
+
+//ENEMY CLASS
+Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, false, imageID, startX, startY, direction, 0,1 , world)
+{
+    
+}
+
+Enemy::~Enemy()
+{
+    
+}
+
+void Enemy::doSomething()
+{
+    
+}
+
+void Enemy::bonk()
+{
+    
+    
+}
+
+
+
+
+
+
+
+//FLAG CLASS
 Flag::Flag( int startX, int startY, StudentWorld* world ,int imageID):Actor(true,false, true, imageID, startX, startY, 0,1,1, world)
 {
     
@@ -84,7 +117,7 @@ void Flag::bonk()
         setStatus(false);
        
     }
-    //std::cerr << getWorld()->getScore() << std::endl;
+    std::cerr << getWorld()->getScore() << std::endl;
    
 }
 
@@ -99,7 +132,12 @@ Mario::~Mario()
 
 void Mario::bonk()
 {
-    
+    if(getStatus())
+    {
+        getWorld()->increaseScore(1000);
+        setStatus(false);
+       
+    }
 }
 void Mario::doSomething()
 {
@@ -109,7 +147,7 @@ void Mario::doSomething()
 
 
 
-
+//STRUCTURES
 Pipe::Pipe(int startX, int startY, StudentWorld* world):Actor(true, false, false, IID_PIPE, startX, startY,0,2,1.0, world )
 {
     
@@ -133,32 +171,12 @@ void Pipe::bonk()
 
 
 
-
-
-
-
 Block::Block( int startX, int startY, bool contains_power, char power, StudentWorld* world): Actor(true, false, false, IID_BLOCK,  startX, startY, 0,2,1.0, world)
 {
     m_contains_Power= contains_power;
     m_power= power;
 }
 
-
-
-
-/*
- 1. A Block object must have an image ID of IID_BLOCK.
- 2. A Block object has a starting (x,y) position based on the current level data file.
- Your StudentWorld object can pass in that position when constructing this object.
- 3. A Block object has a direction of 0 degrees.
- 4. A Block object has a graphical depth of 2.
- 5. A Block object has a default size of 1.
- 6. A Block object may be configured to release a specific type of goodie when it is
- first bonked. Options include: release no goodie at all, release a Star goodie,
- release a Flower goodie, or release a Mushroom goodie.
- 7. A Block starts out in a mode where it has not yet released a goodie.
- 8. A Block object starts out in the alive state.
- */
 Block::~Block()
 {
     
@@ -176,6 +194,8 @@ void Block::bonk()
 }
     
 
+
+//PEACH
 Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, true, IID_PEACH,  startX, startY, 0,0,1.0, world)
 {
     
