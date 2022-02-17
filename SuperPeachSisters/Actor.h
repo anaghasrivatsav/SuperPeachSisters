@@ -58,12 +58,20 @@ private:
 class Block: public Actor
 {
 public:
-    Block( int startX, int startY, bool contains_power, int power, StudentWorld* world);
+    Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
     ~Block();
     void doSomething();
 private:
     bool m_contains_Power;
-    int m_power;
+    char m_power;
+};
+
+class Pipe: public Actor
+{
+public:
+    Pipe(int startX, int startY, StudentWorld* world);
+    ~Pipe();
+    void doSomething();
 };
 
     

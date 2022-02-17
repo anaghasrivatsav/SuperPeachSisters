@@ -68,7 +68,7 @@ int StudentWorld::init()
                         break;}
                    
                     case Level::block:{
-                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,-1, this);
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,' ', this);
                         actors.push_back(b);
                         board[x][y]= '#';
                         break;}
@@ -80,24 +80,48 @@ int StudentWorld::init()
                 case Level::goomba:
                         cout << "Location 5,10 starts with a goomba" << endl;
                         break;
+                 */
                 case Level::star_goodie_block:
-                        cout << "Location 5,10 has a star goodie block" << endl;
+                    {
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'s', this);
+                        actors.push_back(b);
+                        board[x][y]= '*';
                         break;
-                case Level::piranha:
+                    }
+              /*  case Level::piranha:
                         break;
+               */
                 case Level::mushroom_goodie_block:
+                    {
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'m', this);
+                        actors.push_back(b);
+                        board[x][y]= '^';
                         break;
+                    }
                 case Level::flower_goodie_block:
+                    {
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'s', this);
+                        actors.push_back(b);
+                        board[x][y]= '%';
+                    }
                         break;
+                 
+                        
                 case Level::pipe:
+                    {
+                        Pipe *p= new Pipe(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this );
+                        actors.push_back(p);
+                        board[x][y]= 'I';
                         break;
-                case Level::mario:
+                    }
+               /*
+                    case Level::mario:
                         break;
                 case Level::flag:
                         cout << "Location 5,10 is where a flag is" << endl;
-                        break;*/
+                        break;
                         
-                
+                */
                         
             }
         }

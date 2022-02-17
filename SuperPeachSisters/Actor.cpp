@@ -47,11 +47,27 @@ StudentWorld* Actor::getWorld( )
     return m_world;
 }
 
+Pipe::Pipe(int startX, int startY, StudentWorld* world):Actor(true, false, false, IID_PIPE, startX, startY,0,2,1.0, world )
+{
+    
+}
+
+Pipe::~Pipe()
+{
+    
+}
+
+void Pipe::doSomething()
+{
+    
+}
 
 
 
 
-Block::Block( int startX, int startY, bool contains_power, int power, StudentWorld* world): Actor(true, false, false, IID_BLOCK,  startX, startY, 0,2,1.0, world)
+
+
+Block::Block( int startX, int startY, bool contains_power, char power, StudentWorld* world): Actor(true, false, false, IID_BLOCK,  startX, startY, 0,2,1.0, world)
 {
     m_contains_Power= contains_power;
     m_power= power;
@@ -122,7 +138,7 @@ void Peach::doSomething()
              setDirection(180);
              if(getWorld()->isIntersecting(getX() -4, getY(), 'l'))
              {
-                 
+                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
                  break;
                  
              }
@@ -133,6 +149,7 @@ void Peach::doSomething()
              setDirection(0);
              if(getWorld()->isIntersecting(getX() +4, getY(), 'r'))
              {
+                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
                  break;
                  
              }
@@ -143,6 +160,7 @@ void Peach::doSomething()
              
              if(getWorld()->isIntersecting(getX() , getY()+4, 'u'))
              {
+                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
                 break;
              }
              moveTo(getX(), getY()+4);
