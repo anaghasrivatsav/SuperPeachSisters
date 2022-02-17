@@ -87,9 +87,13 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
 {
     
     m_hitPts= 1;
-    m_powers[0]= 0;
+    /*m_powers[0]= 0;
     m_powers[1]= 0;
-    m_powers[2]= 0;
+    m_powers[2]= 0;*/
+    
+    m_flower= false;
+    m_mushroom= false;
+    m_star= false;
     m_invincible= false;
     time_to_recharge_before_next_fire= 0;
     

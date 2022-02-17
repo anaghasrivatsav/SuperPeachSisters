@@ -175,7 +175,7 @@ int StudentWorld::move()
        
     }*/
     
-    decLives();
+    //decLives();
     return GWSTATUS_CONTINUE_GAME;
 }
 

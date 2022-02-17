@@ -44,7 +44,9 @@ public:
 private:
     int m_hitPts;
     bool m_invincible;
-    int  m_powers [3];
+    bool m_flower;
+    bool m_star;
+    bool m_mushroom;
     int invincible_time;
     int time_to_recharge_before_next_fire;
    
