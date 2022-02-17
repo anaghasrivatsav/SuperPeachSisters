@@ -19,7 +19,9 @@ public:
   virtual int move();
   virtual void cleanUp();
     //Actor getIntersectActor();
-    bool isIntersecting(int x, int y, char direction);
+    bool isIntersectingSolid(int x, int y);
+    bool isIntersecting(int x, int y, Actor* it);
+    void peachBonk( int x, int y);
    // void setUp();
 
 private:

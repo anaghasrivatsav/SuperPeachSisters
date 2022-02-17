@@ -17,6 +17,10 @@ public:
     bool damagable();
     bool shareSpace();
     virtual void doSomething()=0;
+    virtual void bonk()=0;
+    void setStatus( bool status);
+    virtual bool canGetBonked();
+    
     StudentWorld* getWorld();
 
     
@@ -38,6 +42,7 @@ public:
     ~Peach();
     void bonk();
     void doSomething();
+    //void bonk();
     //StudentWorld* getWorld();
     
     
@@ -61,6 +66,8 @@ public:
     Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
     ~Block();
     void doSomething();
+    void bonk();
+    bool isStructure();
 private:
     bool m_contains_Power;
     char m_power;
@@ -72,6 +79,29 @@ public:
     Pipe(int startX, int startY, StudentWorld* world);
     ~Pipe();
     void doSomething();
+    void bonk();
+    bool isStructure();
+};
+
+class Flag: public Actor
+{
+public:
+    Flag( int startX, int startY, StudentWorld* world ,int imageId);
+    virtual ~Flag();
+    void doSomething();
+    void bonk();
+    bool isFlag();
+
+    
+};
+
+class Mario:public Flag
+{
+public:
+    Mario(int startX, int startY, StudentWorld* world);
+    ~Mario();
+    void doSomething();
+    void bonk();
 };
 
     

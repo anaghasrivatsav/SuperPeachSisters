@@ -17,7 +17,8 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {
-    
+    //m_score= 0;
+   // m_lives= 3;
 }
 
 StudentWorld::~StudentWorld()
@@ -27,7 +28,7 @@ StudentWorld::~StudentWorld()
 
 int StudentWorld::init()
 {
-   
+    
     Level lev(assetPath());
     string level_file = "level01.txt";
     Level::LoadResult result = lev.loadLevel(level_file);
@@ -114,14 +115,23 @@ int StudentWorld::init()
                         board[x][y]= 'I';
                         break;
                     }
-               /*
-                    case Level::mario:
+               
+                case Level::mario:
+                    {
+                        
+                    
+                        Mario *m= new Mario(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this );
+                        actors.push_back(m);
+                        board[x][y]= 'm';
                         break;
+                    }
                 case Level::flag:
-                        cout << "Location 5,10 is where a flag is" << endl;
+                        Flag *f= new Flag(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this , IID_FLAG);
+                        actors.push_back(f);
+                        board[x][y]= 'f';
                         break;
                         
-                */
+                
                         
             }
         }
@@ -203,53 +213,145 @@ int StudentWorld::move()
     return GWSTATUS_CONTINUE_GAME;
 }
 
- bool StudentWorld::isIntersecting(int x, int y, char direction)
-    {
+void StudentWorld::peachBonk(int x, int y)
+{
     vector<Actor*>::iterator it;
+     
+     
+     
+     
+    // if shareSpace then call the function's doSomething method
     for( it= actors.begin(); it!=actors.end(); it++)
     {
-        if((*it)->shareSpace())
+        if((*it)->canGetBonked() && isIntersecting(peach->getX(), peach->getY(), (*it)))
         {
-            return false;
+            (*it)->bonk();
         }
+    }
     
+}
+
+bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
+{
+    
+    int bigX= x+ SPRITE_WIDTH -1;
+    int bigY= y+SPRITE_HEIGHT -1;
+    
+        if(((x+SPRITE_WIDTH/2)>= (*it).getX() && bigX <= (*it).getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it).getY() && bigY- SPRITE_HEIGHT/2 <= (*it).getY()+SPRITE_HEIGHT -1))
+        {
+            
+         
         
-        int newX= x+ SPRITE_WIDTH -1;
-        int newY= y+SPRITE_HEIGHT -1;
+                return true;
+            
+            
+        }
+    if(((x+SPRITE_WIDTH/2)>= (*it).getX() && bigX- SPRITE_WIDTH/2 <= (*it).getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it).getY() && bigY <= (*it).getY()+SPRITE_HEIGHT -1))
+    {
         
-            if(((x+SPRITE_WIDTH/2)>= (*it)->getX() && newX <= (*it)->getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it)->getY() && newY- SPRITE_HEIGHT/2 <= (*it)->getY()+SPRITE_HEIGHT -1))
+      
+        
+            return true;
+        
+        
+    }
+    
+    if(((x-SPRITE_WIDTH/2)<= (*it).getX() && bigX +SPRITE_WIDTH/2 >= (*it).getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it).getY() && bigY >= ((*it)).getY()+SPRITE_HEIGHT -1))
+    {
+      
+        
+            return true;
+        
+        
+    }
+    if(((x-SPRITE_WIDTH/2)<= (*it).getX() && bigX >= (*it).getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it).getY() && bigY +SPRITE_HEIGHT/2 >= ((*it)).getY()+SPRITE_HEIGHT -1))
+    {
+     
+        
+            return true;
+        
+        
+    }
+    return false;
+
+}
+
+
+
+
+
+ bool StudentWorld::isIntersectingSolid(int x, int y)
+    {
+     
+     
+     
+    vector<Actor*>::iterator it;
+     
+     
+     
+     
+    // if shareSpace then call the function's doSomething method
+    for( it= actors.begin(); it!=actors.end(); it++)
+    {
+        
+      
+        
+        int bigX= x+ SPRITE_WIDTH -1;
+        int bigY= y+SPRITE_HEIGHT -1;
+        
+            if(((x+SPRITE_WIDTH/2)>= (*it)->getX() && bigX <= (*it)->getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it)->getY() && bigY- SPRITE_HEIGHT/2 <= (*it)->getY()+SPRITE_HEIGHT -1))
             {
                 
-                if(direction=='r')
+                if((*it)->shareSpace())
                 {
-                    return true;
+                    //(*it)->doSomething();
+                    return false;
                 }
+            
+            
+                    return true;
+                
                 
             }
-        if(((x+SPRITE_WIDTH/2)>= (*it)->getX() && newX- SPRITE_WIDTH/2 <= (*it)->getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it)->getY() && newY <= (*it)->getY()+SPRITE_HEIGHT -1))
+        if(((x+SPRITE_WIDTH/2)>= (*it)->getX() && bigX- SPRITE_WIDTH/2 <= (*it)->getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it)->getY() && bigY <= (*it)->getY()+SPRITE_HEIGHT -1))
         {
             
-            if(direction=='u')
+            if((*it)->shareSpace())
             {
-                return true;
+                //(*it)->doSomething();
+                return false;
             }
+        
+            
+                return true;
+            
             
         }
         
-        if(((x-SPRITE_WIDTH/2)<= (*it)->getX() && newX +SPRITE_WIDTH/2 >= (*it)->getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it)->getY() && newY >= ((*it))->getY()+SPRITE_HEIGHT -1))
+        if(((x-SPRITE_WIDTH/2)<= (*it)->getX() && bigX +SPRITE_WIDTH/2 >= (*it)->getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it)->getY() && bigY >= ((*it))->getY()+SPRITE_HEIGHT -1))
         {
-            if(direction=='d')
+          
+            if((*it)->shareSpace())
             {
-                return true;
+                //(*it)->doSomething();
+                return false;
             }
+        
+                return true;
+            
             
         }
-        if(((x-SPRITE_WIDTH/2)<= (*it)->getX() && newX >= (*it)->getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it)->getY() && newY +SPRITE_HEIGHT/2 >= ((*it))->getY()+SPRITE_HEIGHT -1))
+        if(((x-SPRITE_WIDTH/2)<= (*it)->getX() && bigX >= (*it)->getX()+SPRITE_WIDTH-1) && ((y-SPRITE_HEIGHT/2)<= (*it)->getY() && bigY +SPRITE_HEIGHT/2 >= ((*it))->getY()+SPRITE_HEIGHT -1))
         {
-            if(direction=='l')
+            if((*it)->shareSpace())
             {
-                return true;
+                //(*it)->doSomething();
+                return false;
             }
+        
+            
+                return true;
+            
             
         }
        /* if( (*peach).getX() >= SPRITE_WIDTH-1 && (*peach).getX() <= x &&( *peach).getY() >= y+SPRITE_HEIGHT-1 && (*peach).getY() <=y)

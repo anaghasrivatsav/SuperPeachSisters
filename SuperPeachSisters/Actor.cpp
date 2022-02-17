@@ -29,6 +29,10 @@ Actor::~Actor()
     
 }
 
+bool Actor::canGetBonked()
+{
+    return true; 
+}
 bool  Actor::getStatus()
 {
     return m_status;
@@ -42,10 +46,69 @@ bool Actor::shareSpace()
 {
     return m_canShareSpace;
 }
+
+void Actor::setStatus(bool status)
+{
+    m_status= status;
+}
+
+
+
 StudentWorld* Actor::getWorld( )
 {
     return m_world;
 }
+
+
+Flag::Flag( int startX, int startY, StudentWorld* world ,int imageID):Actor(true,false, true, imageID, startX, startY, 0,1,1, world)
+{
+    
+}
+
+
+
+Flag::~Flag()
+{
+    
+}
+void Flag::doSomething()
+{
+    
+}
+
+void Flag::bonk()
+{
+    if(getStatus())
+    {
+        getWorld()->increaseScore(1000);
+        setStatus(false);
+       
+    }
+    //std::cerr << getWorld()->getScore() << std::endl;
+   
+}
+
+Mario::Mario(int startX, int startY, StudentWorld* world):Flag(startX, startY, world, IID_MARIO)
+{
+    
+}
+Mario::~Mario()
+{
+    
+}
+
+void Mario::bonk()
+{
+    
+}
+void Mario::doSomething()
+{
+    
+}
+
+
+
+
 
 Pipe::Pipe(int startX, int startY, StudentWorld* world):Actor(true, false, false, IID_PIPE, startX, startY,0,2,1.0, world )
 {
@@ -62,6 +125,13 @@ void Pipe::doSomething()
     
 }
 
+void Pipe::bonk()
+{
+    
+}
+
+
+
 
 
 
@@ -72,6 +142,8 @@ Block::Block( int startX, int startY, bool contains_power, char power, StudentWo
     m_contains_Power= contains_power;
     m_power= power;
 }
+
+
 
 
 /*
@@ -94,6 +166,11 @@ Block::~Block()
 
 
 void Block::doSomething()
+{
+    
+}
+
+void Block::bonk()
 {
     
 }
@@ -136,7 +213,7 @@ void Peach::doSomething()
      {
      case KEY_PRESS_LEFT:
              setDirection(180);
-             if(getWorld()->isIntersecting(getX() -4, getY(), 'l'))
+             if(getWorld()->isIntersectingSolid(getX() -4, getY()))
              {
                  (*getWorld()).playSound(SOUND_PLAYER_BONK);
                  break;
@@ -147,7 +224,7 @@ void Peach::doSomething()
              break;
      case KEY_PRESS_RIGHT:
              setDirection(0);
-             if(getWorld()->isIntersecting(getX() +4, getY(), 'r'))
+             if(getWorld()->isIntersectingSolid(getX() +4, getY()))
              {
                  (*getWorld()).playSound(SOUND_PLAYER_BONK);
                  break;
@@ -158,7 +235,7 @@ void Peach::doSomething()
              break;
     case KEY_PRESS_UP:
              
-             if(getWorld()->isIntersecting(getX() , getY()+4, 'u'))
+             if(getWorld()->isIntersectingSolid(getX() , getY()+4))
              {
                  (*getWorld()).playSound(SOUND_PLAYER_BONK);
                 break;
@@ -166,15 +243,19 @@ void Peach::doSomething()
              moveTo(getX(), getY()+4);
              break;
     case KEY_PRESS_DOWN:
-             if(getWorld()->isIntersecting(getX() , getY()-4, 'd'))
+             if(getWorld()->isIntersectingSolid(getX() , getY()-4))
              {
                 break;
              }
              moveTo(getX(), getY()-4);
              break;
              
+    
+             
              
      }
+         
+         getWorld()->peachBonk(getX(), getY());
      }
     /*
     if( !getStatus())
