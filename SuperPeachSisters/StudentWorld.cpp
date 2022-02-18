@@ -233,7 +233,40 @@ void StudentWorld::peachBonk(int x, int y)
     {
         if((*it)->canGetBonked() && isIntersecting(peach->getX(), peach->getY(), (*it)))
         {
-            (*it)->bonk();
+            int actor= (*it)->bonk();
+            
+            switch(actor)
+            {
+                case 1:
+                    peach->addHitPts(-1);
+                    if( !peach->isInvincible() && !peach->hasStarPower())
+                    {
+                        if( peach->hasMushroomPower() || peach->hasFlowerPower())
+                        {
+                            peach->setMushroomPower(false);
+                            peach->setFlowerPower(false);
+                            peach->setInvincible(true);
+                        }
+                    }
+                    if( peach->getHitPts()>0)
+                    {
+                        playSound(SOUND_PLAYER_HURT);
+                    }
+                    else
+                    {
+                        playSound(SOUND_PLAYER_DIE);
+                        peach->setStatus(false);
+                        decLives();
+                        if( !(getLives() > 0))
+                        {
+                            std::cerr<<"PEACH DIED"<< std::endl;
+                        }
+                    }
+             
+                    
+            }
+               
+            
         }
     }
     

@@ -17,7 +17,7 @@ public:
     bool damagable();
     bool shareSpace();
     virtual void doSomething()=0;
-    virtual void bonk()=0;
+    virtual int bonk()=0;
     void setStatus( bool status);
     virtual bool canGetBonked();
     
@@ -40,8 +40,18 @@ class Peach: public Actor
 public:
     Peach(int startX ,int startY, StudentWorld *world);
     ~Peach();
-    void bonk();
+     int bonk();
     void doSomething();
+    bool isInvincible();
+    bool hasStarPower();
+    bool hasMushroomPower();
+    bool hasFlowerPower();
+    void setMushroomPower(bool f);
+    void setFlowerPower(bool f);
+    void setStarPower(bool f);
+    void setInvincible(bool f);
+    void addHitPts( int ht);
+    int getHitPts();
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -70,7 +80,7 @@ public:
     Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
     ~Block();
     void doSomething();
-    void bonk();
+    int bonk();
     bool isStructure();
 private:
     bool m_contains_Power;
@@ -83,7 +93,7 @@ public:
     Pipe(int startX, int startY, StudentWorld* world);
     ~Pipe();
     void doSomething();
-    void bonk();
+    int bonk();
     bool isStructure();
 };
 
@@ -93,7 +103,7 @@ public:
     Flag( int startX, int startY, StudentWorld* world ,int imageId);
     virtual ~Flag();
     void doSomething();
-    void bonk();
+    int bonk();
     bool isFlag();
 
     
@@ -105,7 +115,7 @@ public:
     Mario(int startX, int startY, StudentWorld* world);
     ~Mario();
     void doSomething();
-    void bonk();
+    int bonk();
 };
 
     
@@ -120,7 +130,7 @@ public:
     Enemy( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Enemy();
     void doSomething();
-    void bonk();
+    int bonk();
 private:
     int m_direction;
 

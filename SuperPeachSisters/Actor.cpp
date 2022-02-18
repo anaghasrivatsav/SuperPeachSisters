@@ -119,9 +119,9 @@ void Enemy::doSomething()
     
 }
 
-void Enemy::bonk()
+int Enemy::bonk()
 {
-    
+    return 1;
     
 }
 
@@ -176,7 +176,7 @@ void Flag::doSomething()
     
 }
 
-void Flag::bonk()
+int Flag::bonk()
 {
     if(getStatus())
     {
@@ -184,7 +184,8 @@ void Flag::bonk()
         setStatus(false);
        
     }
-    std::cerr << getWorld()->getScore() << std::endl;
+   // std::cerr << getWorld()->getScore() << std::endl;
+    return 3;
    
 }
 
@@ -197,7 +198,7 @@ Mario::~Mario()
     
 }
 
-void Mario::bonk()
+int Mario::bonk()
 {
     if(getStatus())
     {
@@ -205,6 +206,7 @@ void Mario::bonk()
         setStatus(false);
        
     }
+    return 3;
 }
 void Mario::doSomething()
 {
@@ -230,9 +232,9 @@ void Pipe::doSomething()
     
 }
 
-void Pipe::bonk()
+int Pipe::bonk()
 {
-    
+    return 2;
 }
 
 
@@ -255,9 +257,17 @@ void Block::doSomething()
     
 }
 
-void Block::bonk()
+int Block::bonk()
 {
-    
+    if( m_contains_Power)
+    {
+        getWorld()->playSound(SOUND_POWERUP_APPEARS);
+    }
+    else
+    {
+        getWorld()->playSound(SOUND_PLAYER_KICK);
+    }
+    return 2;
 }
     
 
@@ -288,13 +298,70 @@ Peach::~Peach()
 {
     //delete [] m_powers;
 }
-void Peach::bonk()
+int Peach::bonk()
 {
-    
+    return 0;
 }
 
  
+bool Peach::isInvincible()
+{
+    return m_invincible;
+}
 
+bool Peach::hasStarPower()
+{
+    return m_star;
+}
+
+bool Peach::hasFlowerPower()
+{
+    return m_flower;
+}
+
+bool Peach:: hasMushroomPower()
+{
+    return m_mushroom;
+}
+
+void Peach::setMushroomPower( bool f)
+{
+    m_mushroom= f;
+   
+}
+
+void Peach::setFlowerPower(bool f)
+{
+    m_flower= f;
+}
+
+void Peach::setStarPower(bool f)
+{
+    m_star= f;
+}
+
+void Peach::setInvincible(bool f)
+{
+    if (f)
+    {
+        m_invincible = true;
+        invincible_time= 10;
+    }
+    else
+    {
+        m_invincible= false;
+        
+    }
+}
+
+void Peach::addHitPts( int ht)
+{
+    m_hitPts += ht;
+}
+int Peach:: getHitPts()
+{
+    return m_hitPts;
+}
 
 void Peach::doSomething()
 {
@@ -303,6 +370,8 @@ void Peach::doSomething()
         return;
     }
     
+    
+    //temporary invincibility
     if( m_invincible)
     {
         invincible_time--;
