@@ -121,6 +121,8 @@ public:
     ~Enemy();
     void doSomething();
     void bonk();
+private:
+    int m_direction;
 
 
 };
@@ -130,7 +132,7 @@ class Goomba:public Enemy
 public:
     Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Goomba();
-    //void doSomething();
+    void doSomething();
     //void bonk();
     
 };

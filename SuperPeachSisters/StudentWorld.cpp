@@ -408,6 +408,8 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
      return false;
  }
 
+
+
     
         
 
@@ -431,6 +433,8 @@ void StudentWorld::cleanUp()
     }
     delete peach;
 }
+
+
 
 
 

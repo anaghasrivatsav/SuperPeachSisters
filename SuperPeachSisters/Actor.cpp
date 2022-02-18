@@ -67,7 +67,7 @@ StudentWorld* Actor::getWorld( )
 //ENEMY CLASS
 Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, true, imageID, startX, startY, direction, 0,1 , world)
 {
-    
+    m_direction= direction;
 }
 
 Enemy::~Enemy()
@@ -77,6 +77,45 @@ Enemy::~Enemy()
 
 void Enemy::doSomething()
 {
+    if(m_direction==0)
+    {
+        if( getWorld()->isIntersectingSolid(getX()+1, getY()))
+        {
+            m_direction = 180;
+            setDirection(180);
+        }
+        else if( !getWorld()->isIntersectingSolid(getX()+SPRITE_WIDTH, getY()-1))
+        {
+            m_direction= 180;
+            setDirection(180);
+            
+        }
+        else
+        {
+            moveTo(getX()+1, getY());
+        }
+    }
+    else if( m_direction == 180)
+        {
+            if( getWorld()->isIntersectingSolid(getX()-1, getY()))
+            {
+                m_direction = 0;
+                setDirection(0);
+            }
+            else if( !getWorld()->isIntersectingSolid(getX()-SPRITE_WIDTH, getY()-1))
+            {
+                m_direction= 0;
+                setDirection(0);
+                
+            }
+            else
+            {
+                moveTo(getX()-1, getY());
+            }
+            
+        }
+                
+   
     
 }
 
@@ -95,6 +134,13 @@ Goomba::Goomba( int startX, int startY, StudentWorld* world, int imageID, int di
 Goomba::~Goomba()
 {
     
+}
+
+void Goomba::doSomething()
+{
+
+    Enemy::doSomething();
+    //std::cerr<< "DOES SOMETHING"<< std::endl;
 }
 
 
@@ -324,7 +370,7 @@ void Peach::doSomething()
                  break;
                  
              }
-             if( !getWorld()->isIntersectingSolid(getX() -4, getY()-1))
+             if( !getWorld()->isIntersectingSolid(getX() -4, getY()-1)&&!m_jumping)
              {
                  m_falling = true;
              }
@@ -338,7 +384,7 @@ void Peach::doSomething()
                  break;
                  
              }
-             if( !getWorld()->isIntersectingSolid(getX() +4, getY()-1))
+             if( !getWorld()->isIntersectingSolid(getX() +4, getY()-1)&&!m_jumping)
              {
                  m_falling = true;
              }
