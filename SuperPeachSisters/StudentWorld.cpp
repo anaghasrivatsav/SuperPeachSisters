@@ -75,13 +75,21 @@ int StudentWorld::init()
                         break;}
                     default:{
                         break;}
-                /*case Level::koopa:
-                        cout << "Location 5,10 starts with a koopa" << endl;
+                case Level::koopa:
+                    {
+                        Koopa *k = new Koopa(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_KOOPA, randDirection() );
+                        actors.push_back(k);
+                        board[x][y]= 'k';
                         break;
+                    }
                 case Level::goomba:
-                        cout << "Location 5,10 starts with a goomba" << endl;
+                    {
+                        Goomba *g = new Goomba(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_GOOMBA, randDirection() );
+                        actors.push_back(g);
+                        board[x][y]= 'g';
                         break;
-                 */
+                    }
+                 
                 case Level::star_goodie_block:
                     {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'s', this);
@@ -229,6 +237,20 @@ void StudentWorld::peachBonk(int x, int y)
         }
     }
     
+}
+
+int StudentWorld::randDirection()
+{
+    int x= randInt(0,9);
+    if( x%2== 0)
+    {
+        return 0;
+    }
+    else{
+        
+        return 180;
+    }
+        
 }
 
 bool StudentWorld::isIntersecting( int x, int y,  Actor* it)

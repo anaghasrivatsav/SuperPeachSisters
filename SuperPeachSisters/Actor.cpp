@@ -65,7 +65,7 @@ StudentWorld* Actor::getWorld( )
 
 
 //ENEMY CLASS
-Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, false, imageID, startX, startY, direction, 0,1 , world)
+Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, true, imageID, startX, startY, direction, 0,1 , world)
 {
     
 }
@@ -86,6 +86,27 @@ void Enemy::bonk()
     
 }
 
+
+Goomba::Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction): Enemy(  startX, startY, world, imageID, direction)
+{
+    
+}
+
+Goomba::~Goomba()
+{
+    
+}
+
+
+Koopa::Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction): Enemy(  startX, startY, world, imageID, direction)
+{
+    
+}
+
+Koopa::~Koopa()
+{
+    
+}
 
 
 
@@ -209,6 +230,10 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
     m_star= false;
     m_invincible= false;
     time_to_recharge_before_next_fire= 0;
+    m_jumping= false;
+    remaining_jump_distance= 8;
+    m_falling= false;
+    
     
     
 }
@@ -223,8 +248,68 @@ void Peach::bonk()
 }
 
  
+
+
 void Peach::doSomething()
 {
+    if(!getStatus())
+    {
+        return;
+    }
+    
+    if( m_invincible)
+    {
+        invincible_time--;
+        if( invincible_time <= 0)
+        {
+            m_invincible= false;
+        }
+    }
+    
+    
+    if(m_jumping&& remaining_jump_distance >0)
+    {
+      if(getWorld()->isIntersectingSolid(getX(), getY()+4))
+      {
+          int jumpUp= 0;
+          while(!getWorld()->isIntersectingSolid(getX(), getY()+jumpUp))
+          {
+              jumpUp++;
+          }
+          moveTo(getX(), getY()+jumpUp);
+          getWorld()->playSound(SOUND_PLAYER_BONK);
+          remaining_jump_distance= 0;
+      }
+        else if( m_jumping)
+        {
+            moveTo(getX(), getY()+4);
+            remaining_jump_distance --;
+        }
+        if( remaining_jump_distance==0)
+        {
+            m_falling= true;
+            m_jumping = false;
+        }
+    }
+    
+    if( m_falling)
+    {
+        if(getWorld()->isIntersectingSolid(getX(), getY()-3) )
+        {
+            int fallDown= 0;
+            while(!getWorld()->isIntersectingSolid(getX(), getY()-fallDown))
+            {
+                fallDown++;
+            }
+            moveTo(getX(), getY()- fallDown+1);
+            m_falling = false;
+        }
+        else{
+            moveTo(getX(), getY()- 4);
+            
+        }
+    }
+    
      int ch;
      if (getWorld()->getKey(ch))
      {
@@ -239,8 +324,11 @@ void Peach::doSomething()
                  break;
                  
              }
-             
-             moveTo(getX() -4, getY());
+             if( !getWorld()->isIntersectingSolid(getX() -4, getY()-1))
+             {
+                 m_falling = true;
+             }
+                moveTo(getX() -4, getY());
              break;
      case KEY_PRESS_RIGHT:
              setDirection(0);
@@ -250,25 +338,44 @@ void Peach::doSomething()
                  break;
                  
              }
-             
-             moveTo(getX() +4, getY());
+             if( !getWorld()->isIntersectingSolid(getX() +4, getY()-1))
+             {
+                 m_falling = true;
+             }
+                moveTo(getX() +4, getY());
+             break;
              break;
     case KEY_PRESS_UP:
              
-             if(getWorld()->isIntersectingSolid(getX() , getY()+4))
+             /*if(getWorld()->isIntersectingSolid(getX() , getY()+4))
              {
                  (*getWorld()).playSound(SOUND_PLAYER_BONK);
                 break;
              }
              moveTo(getX(), getY()+4);
+              */
+             if( getWorld()->isIntersectingSolid(getX() , getY()-1))
+             {
+                 m_jumping = true;
+                 if(m_mushroom)
+                 {
+                     remaining_jump_distance= 12;
+                 }
+                 else{
+                     remaining_jump_distance= 12;
+                 }
+                 getWorld()->playSound(SOUND_PLAYER_JUMP);
+             }
+            
+             
              break;
-    case KEY_PRESS_DOWN:
+   /* case KEY_PRESS_DOWN:
              if(getWorld()->isIntersectingSolid(getX() , getY()-4))
              {
                 break;
              }
              moveTo(getX(), getY()-4);
-             break;
+             break;*/
              
     
              
@@ -277,6 +384,30 @@ void Peach::doSomething()
          
          getWorld()->peachBonk(getX(), getY());
      }
+    
+    /*
+    Peach must check to see if she is currently alive. If not, then Peach’s
+    doSomething() method must return immediately – none of the following steps
+    should be performed.
+    2. Peach must check if she is currently invincible (Star Power), and if so, decrement
+    the number of remaining game ticks before she loses this invincibility power. If
+    this tick count reaches zero, Peach must set her invincibility status to off.
+    3. Peach must check if she is currently temporarily invincible, and if so, decrement
+    the number of remaining game ticks before she loses temporary invincibility. If
+    this tick count reaches zero, Peach must set her temporary invincibility status to
+    false. (Peach gains temporary invincibility if she overlaps with an enemy while
+    she has Jump Power or Fire Power.)
+    4. Peach must check if she is currently in “recharge” mode before she can fire again.
+    If the number of time_to_recharge_before_next_fire ticks is greater than zero, she
+    must decrement this tick count by one. If the tick count reaches zero, then Peach
+    may again shoot a fireball (if she has Shoot Power).
+    
+    
+    */
+    
+    
+    
+    
     /*
     if( !getStatus())
     {

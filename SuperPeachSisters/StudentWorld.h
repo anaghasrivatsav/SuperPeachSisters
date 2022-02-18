@@ -21,6 +21,7 @@ public:
     //Actor getIntersectActor();
     bool isIntersectingSolid(int x, int y);
     bool isIntersecting(int x, int y, Actor* it);
+    int randDirection();
     void peachBonk( int x, int y);
    // void setUp();
 

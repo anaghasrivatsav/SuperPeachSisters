@@ -54,6 +54,10 @@ private:
     bool m_mushroom;
     int invincible_time;
     int time_to_recharge_before_next_fire;
+    bool m_jumping;
+    bool m_falling;
+    int remaining_jump_distance;
+    
    
     
     
@@ -124,20 +128,20 @@ public:
 class Goomba:public Enemy
 {
 public:
-    Goomba( int startX, int startY, StudentWorld* world);
+    Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Goomba();
-    void doSomething();
-    void bonk();
+    //void doSomething();
+    //void bonk();
     
 };
 
 class Koopa:public Enemy
 {
 public:
-    Koopa( int startX, int startY, StudentWorld* world);
+    Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Koopa();
-    void doSomething();
-    void bonk();
+    //void doSomething();
+    //void bonk();
     
 };
 
