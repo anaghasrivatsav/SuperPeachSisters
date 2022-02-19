@@ -413,6 +413,21 @@ int Flower::bonk()
 {
     return 7;
 }
+    
+Star::Star(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_STAR)
+{
+        
+}
+
+Star::~Star()
+{
+        
+}
+
+int Star::bonk()
+{
+        return 9;
+}
 
 
 
@@ -594,7 +609,8 @@ int Block::bonk()
         }
         if(m_power== 's')
         {
-            // make star
+            Star *s= new Star(getX(), getY()+8, getWorld());
+            getWorld()->addToVector(s);
             return 4;
         }
         if(m_power== 'f')
@@ -636,6 +652,7 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
     m_jumping= false;
     remaining_jump_distance= 300;
     m_falling= false;
+    remaining_star_time= 0;
     
     
     
@@ -685,11 +702,16 @@ void Peach::setFlowerPower(bool f)
 void Peach::setStarPower(bool f)
 {
     m_star= f;
+    remaining_star_time= 150;
 }
 
 void Peach::setInvincibleTime( int n)
 {
     invincible_time= n;
+}
+int Peach::getStarTime ()
+{
+    return remaining_star_time;
 }
 
 void Peach::setInvincible(bool f)
@@ -735,6 +757,14 @@ void Peach::doSomething()
         return;
     }
     
+    if( hasStarPower())
+    {
+        remaining_star_time--;
+        if(remaining_star_time <= 0)
+        {
+            setStarPower(false);
+        }
+    }
     
     //temporary invincibility
     if( m_invincible)

@@ -206,42 +206,8 @@ void StudentWorld::peachBonk(int x, int y)
             
             switch(actor)
             {
-                case 1:
-                   
-                   /*
-                    if( (*it)->canFire())
-                    {
-                       
-                        if( !(peach->getY() > (*it)->getY() - 1.5*SPRITE_HEIGHT&&peach->getY() < (*it)->getY() + 1.5*SPRITE_HEIGHT))
-                        {
-                            break;
-                        }
-                        if(peach->getX() > (*it)->getX())
-                        {
-                            (*it)->setDirection(0);
-                        }
-                        else
-                        {(*it)->setDirection(180);
-                            
-                        }
-                        if((*it)->getFiringDelay() >0)
-                        {
-                            
-                            (*it)->setFiringDelay(-1);
-                            break;
-                        }
-                        else if( (peach->getX() > (*it)->getX() - 8*SPRITE_WIDTH&&peach->getX() < (*it)->getX() + 8*SPRITE_WIDTH))
-                        {
-                            PiranhaFireball *f = new PiranhaFireball ((*it)->getX(), (*it)->getY(), this, (*it)->getDirection());
-                            actors.push_back(f);
-                            playSound(SOUND_PIRANHA_FIRE);
-                            (*it)-> setFiringDelay(40);
-                           // std::cerr << "PIRANHA DO SMTH PLEASE"<< std::endl;
-                            
-                        }
-                    }
-                    */
-                    break;
+                    
+                
                     
                     
                
@@ -265,6 +231,16 @@ void StudentWorld::peachBonk(int x, int y)
                         peach->addHitPts(1);
                     }
                     peach->setFlowerPower(true);
+                    playSound(SOUND_PLAYER_POWERUP);
+                    break;
+                case 9:
+                    (*it)->setStatus(false);
+                    increaseScore(100);
+                    if( peach->getHitPts()==1)
+                    {
+                        peach->addHitPts(1);
+                    }
+                    peach->setStarPower(true);
                     playSound(SOUND_PLAYER_POWERUP);
                     break;
                     
@@ -483,7 +459,7 @@ int StudentWorld::peachY()
 
 void StudentWorld::damagePeach()
 {
-    if(!peach->isInvincible())
+    if(!peach->isInvincible()&&!peach->hasStarPower())
     {
         peach->addHitPts(-1);
     }
@@ -495,13 +471,13 @@ void StudentWorld::damagePeach()
             peach->setMushroomPower(false);
             peach->setFlowerPower(false);
             peach->setInvincible(true);
-            std::cerr <<"run once"<<std::endl;
+            //std::cerr <<"run once"<<std::endl;
             return;
         }
         
     }
     
-    if( peach->getHitPts()>0)
+    if( peach->getHitPts()>0&&!peach->hasStarPower() )
     {
         playSound(SOUND_PLAYER_HURT);
     }
@@ -509,8 +485,8 @@ void StudentWorld::damagePeach()
     else
     {
         playSound(SOUND_PLAYER_DIE);
-        peach->setStatus(false);
-        decLives();
+       // peach->setStatus(false);
+       // decLives();
         if( !(getLives() > 0))
         {
             //std::cerr<<"PEACH DIED"<< std::endl;

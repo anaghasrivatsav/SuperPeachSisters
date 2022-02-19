@@ -67,6 +67,7 @@ public:
     bool canFire();
     void damagePeach();
     void setInvincibleTime(int n);
+    int getStarTime( );
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -82,6 +83,7 @@ private:
     bool m_jumping;
     bool m_falling;
     int remaining_jump_distance;
+    int remaining_star_time;
     
    
     
@@ -248,6 +250,14 @@ class Flower: public Goodie
 public:
     Flower(int startX, int startY, StudentWorld* world);
     ~Flower();
+    int bonk();
+};
+
+class Star: public Goodie
+{
+public:
+    Star( int startX, int startY, StudentWorld* world);
+    ~Star();
     int bonk();
 };
 
