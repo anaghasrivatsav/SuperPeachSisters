@@ -20,6 +20,10 @@ public:
     virtual int bonk()=0;
     void setStatus( bool status);
     virtual bool canGetBonked();
+    virtual bool canFire();
+    int getFiringDelay();
+    void setFiringDelay(int x);
+
     
     StudentWorld* getWorld();
 
@@ -28,6 +32,7 @@ private:
     bool m_status; // alive is true
     bool m_canBeDamaged;
     bool m_canShareSpace;
+    int m_firing_delay;
     StudentWorld *m_world;
     
     
@@ -52,6 +57,7 @@ public:
     void setInvincible(bool f);
     void addHitPts( int ht);
     int getHitPts();
+    bool canFire();
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -74,7 +80,19 @@ private:
     
 };
 
-class Block: public Actor
+
+
+class Pipe: public Actor
+{
+public:
+    Pipe(int startX, int startY, StudentWorld* world, int imageID);
+    ~Pipe();
+    void doSomething();
+    virtual int bonk();
+    bool isStructure();
+};
+
+class Block: public Pipe
 {
 public:
     Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
@@ -85,16 +103,6 @@ public:
 private:
     bool m_contains_Power;
     char m_power;
-};
-
-class Pipe: public Actor
-{
-public:
-    Pipe(int startX, int startY, StudentWorld* world);
-    ~Pipe();
-    void doSomething();
-    int bonk();
-    bool isStructure();
 };
 
 class Flag: public Actor
@@ -129,8 +137,9 @@ public:
 public:
     Enemy( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Enemy();
-    void doSomething();
-    int bonk();
+    virtual void doSomething();
+    virtual int bonk();
+    
 private:
     int m_direction;
 
@@ -143,6 +152,7 @@ public:
     Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Goomba();
     void doSomething();
+   
     //void bonk();
     
 };
@@ -152,8 +162,50 @@ class Koopa:public Enemy
 public:
     Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Koopa();
-    //void doSomething();
+    void doSomething();
+
     //void bonk();
+    
+};
+
+class Piranha:public Enemy
+{
+public:
+    Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    ~Piranha();
+    void doSomething();
+    int getFiringDelay();
+    void setFiringDelay(int x);
+    int bonk();
+    bool canFire();
+    
+private:
+    int m_firing_delay;
+};
+
+
+//PROJECTILES
+
+class Projectiles:public Actor
+{
+public:
+    Projectiles(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    ~Projectiles();
+    void doSomething();
+    
+    
+};
+
+class PiranhaFireball:public Projectiles
+{
+public:
+    PiranhaFireball(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    ~PiranhaFireball();
+    void doSomething();
+   
+    
+
+    
     
 };
 

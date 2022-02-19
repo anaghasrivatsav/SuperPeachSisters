@@ -97,9 +97,14 @@ int StudentWorld::init()
                         board[x][y]= '*';
                         break;
                     }
-              /*  case Level::piranha:
+               case Level::piranha:
+                    {
+                        Piranha *p = new Piranha(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_PIRANHA, randDirection() );
+                        actors.push_back(p);
+                        board[x][y]= 'p';
                         break;
-               */
+                    }
+               
                 case Level::mushroom_goodie_block:
                     {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'m', this);
@@ -118,7 +123,7 @@ int StudentWorld::init()
                         
                 case Level::pipe:
                     {
-                        Pipe *p= new Pipe(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this );
+                        Pipe *p= new Pipe(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this, IID_PIPE );
                         actors.push_back(p);
                         board[x][y]= 'I';
                         break;
@@ -238,6 +243,7 @@ void StudentWorld::peachBonk(int x, int y)
             switch(actor)
             {
                 case 1:
+                    //std::cerr<< "RAN INTO ENEMY" << std::endl;
                     peach->addHitPts(-1);
                     if( !peach->isInvincible() && !peach->hasStarPower())
                     {
@@ -259,9 +265,35 @@ void StudentWorld::peachBonk(int x, int y)
                         decLives();
                         if( !(getLives() > 0))
                         {
-                            std::cerr<<"PEACH DIED"<< std::endl;
+                            //std::cerr<<"PEACH DIED"<< std::endl;
                         }
                     }
+                    if( (*it)->canFire())
+                    {
+                        if( !(peach->getY() > (*it)->getY() - 1.5*SPRITE_HEIGHT&&peach->getY() < (*it)->getY() + 1.5*SPRITE_HEIGHT))
+                        {
+                            break;
+                        }
+                        if(peach->getX() > (*it)->getX())
+                        {
+                            (*it)->setDirection(0);
+                        }
+                        else
+                        {(*it)->setDirection(0);
+                            
+                        }
+                        if((*it)->getFiringDelay() >0)
+                        {
+                            (*it)->setFiringDelay(-1);
+                            break;
+                        }
+                        else if( (peach->getX() > (*it)->getY() - 8*SPRITE_WIDTH&&peach->getX() < (*it)->getY() + 8*SPRITE_WIDTH))
+                        {
+                            PiranhaFireball f = new PiranhaFireball ((*it)->getX(), (*it)->getY(), this, IID_PIRANHA_FIRE, (*it)->getDirection());
+                            
+                        }
+                    }
+                
              
                     
             }
@@ -288,6 +320,8 @@ int StudentWorld::randDirection()
 
 bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
 {
+    /*
+    
     int x_max= x+ SPRITE_WIDTH -1;
     int y_max= y+SPRITE_HEIGHT -1;
     
@@ -318,9 +352,9 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
         return true;
     }
     return false;
+    */
     
-    
-  /*  int bigX= x+ SPRITE_WIDTH -1;
+    int bigX= x+ SPRITE_WIDTH -1;
     int bigY= y+SPRITE_HEIGHT -1;
     
         if(((x+SPRITE_WIDTH/2)>= (*it).getX() && bigX <= (*it).getX()+SPRITE_WIDTH-1) && ((y+SPRITE_HEIGHT/2)>= (*it).getY() && bigY- SPRITE_HEIGHT/2 <= (*it).getY()+SPRITE_HEIGHT -1))
@@ -359,8 +393,9 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
         
     }
     return false;
-   */
+   
 
+     
 }
 
 

@@ -23,6 +23,7 @@ Actor::Actor( bool status, bool canBeDamaged, bool canShareSpace, int imageID, i
     m_canBeDamaged= canBeDamaged;
     m_canShareSpace= canShareSpace;
     m_world= world;
+    m_firing_delay= 0;
     
 }
 Actor::~Actor()
@@ -39,6 +40,11 @@ bool  Actor::getStatus()
     return m_status;
 }
 
+bool Actor::canFire()
+{
+    return false;
+}
+
 bool Actor::damagable()
 {
     return m_canBeDamaged;
@@ -51,6 +57,16 @@ bool Actor::shareSpace()
 void Actor::setStatus(bool status)
 {
     m_status= status;
+}
+
+void Actor::setFiringDelay(int x)
+{
+    m_firing_delay= m_firing_delay + x;
+}
+
+int Actor::getFiringDelay()
+{
+    return m_firing_delay;
 }
 
 
@@ -126,6 +142,8 @@ int Enemy::bonk()
 }
 
 
+
+
 Goomba::Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction): Enemy(  startX, startY, world, imageID, direction)
 {
     
@@ -151,8 +169,48 @@ Koopa::Koopa( int startX, int startY, StudentWorld* world, int imageID, int dire
 
 Koopa::~Koopa()
 {
+  
     
 }
+
+void Koopa::doSomething()
+{
+    Enemy::doSomething();
+}
+
+Piranha::Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction):Enemy(  startX, startY, world, imageID, direction)
+{
+    m_firing_delay = 0;
+}
+
+Piranha::~Piranha()
+{
+    
+}
+
+void Piranha::doSomething()
+{
+    if (!getStatus())
+    {
+        return;
+    }
+}
+
+bool Piranha::canFire()
+{
+    return true;
+    
+}
+
+
+
+int Piranha::bonk()
+{
+    return 1;
+}
+
+
+
 
 
 
@@ -214,10 +272,18 @@ void Mario::doSomething()
 }
 
 
+//PROJECTILES
+
+Projectiles::Projectiles( int startX, int startY, StudentWorld* world, int imageID, int direction):Actor( true, true, true, imageID, startX, startY, direction, 1,1, world)
+{
+    
+}
+
+
 
 
 //STRUCTURES
-Pipe::Pipe(int startX, int startY, StudentWorld* world):Actor(true, false, false, IID_PIPE, startX, startY,0,2,1.0, world )
+Pipe::Pipe(int startX, int startY, StudentWorld* world ,int imageID):Actor(true, false, false, imageID, startX, startY,0,2,1.0, world )
 {
     
 }
@@ -240,7 +306,7 @@ int Pipe::bonk()
 
 
 
-Block::Block( int startX, int startY, bool contains_power, char power, StudentWorld* world): Actor(true, false, false, IID_BLOCK,  startX, startY, 0,2,1.0, world)
+Block::Block( int startX, int startY, bool contains_power, char power, StudentWorld* world): Pipe(startX, startY, world, IID_BLOCK)
 {
     m_contains_Power= contains_power;
     m_power= power;
@@ -363,6 +429,11 @@ int Peach:: getHitPts()
     return m_hitPts;
 }
 
+bool Peach:: canFire()
+{
+    return true;
+}
+
 void Peach::doSomething()
 {
     if(!getStatus())
@@ -380,7 +451,7 @@ void Peach::doSomething()
             m_invincible= false;
         }
     }
-    
+    getWorld()->peachBonk(getX(), getY());
     
     if(m_jumping&& remaining_jump_distance >0)
     {
@@ -497,7 +568,7 @@ void Peach::doSomething()
              
      }
          
-         getWorld()->peachBonk(getX(), getY());
+       
      }
     
     /*
