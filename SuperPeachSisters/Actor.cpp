@@ -406,16 +406,30 @@ void Block::doSomething()
 }
 
 int Block::bonk()
-{std::cerr << "block"<< std::endl;
+{
     if( m_contains_Power)
     {
         getWorld()->playSound(SOUND_POWERUP_APPEARS);
-        std::cerr << "powerup"<< std::endl;
+        if(m_power== 'm')
+        {
+            // make mushroom
+        }
+        if(m_power== 's')
+        {
+            // make star
+        }
+        if(m_power== 'f')
+        {
+            // make flower
+        }
+        m_contains_Power= false;
+        
+        
     }
     else
     {
         getWorld()->playSound(SOUND_PLAYER_BONK);
-        std::cerr << "blockbonk"<< std::endl;
+       
         
     }
     return 2;
@@ -438,7 +452,7 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
     m_invincible= false;
     time_to_recharge_before_next_fire= 0;
     m_jumping= false;
-    remaining_jump_distance= 8;
+    remaining_jump_distance= 300;
     m_falling= false;
     
     
@@ -577,7 +591,7 @@ void Peach::doSomething()
               jumpUp++;
           }
           moveTo(getX(), getY()+jumpUp);
-          getWorld()->peachBonk(getX(), getY());
+          getWorld()->peachBonk(getX(), getY()+4);
           remaining_jump_distance= 0;
       }
         else if( m_jumping)

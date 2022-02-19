@@ -209,11 +209,10 @@ public:
    //void doSomething();
     virtual int bonk();
    
-    
-
-    
-    
 };
+
+
+
 
 
 // keep track of attributes of each of these objects
