@@ -24,6 +24,10 @@ public:
     int getFiringDelay();
     void setFiringDelay(int x);
     virtual bool isProjectile();
+    void fall();
+    bool isFalling();
+    void setFalling(bool f);
+    
 
     
     StudentWorld* getWorld();
@@ -35,6 +39,7 @@ private:
     bool m_canShareSpace;
     int m_firing_delay;
     StudentWorld *m_world;
+    bool m_falling;
     
     
     
@@ -211,7 +216,34 @@ public:
    
 };
 
+//GOODIES
 
+class Goodie:public Actor
+{
+public:
+    Goodie(int startX, int startY, StudentWorld* world,  int imageID);
+    ~Goodie();
+    virtual int bonk()= 0;
+    void doSomething();
+    
+};
+
+
+class Mushroom: public Goodie
+{
+public:
+    Mushroom(int startX, int startY, StudentWorld* world);
+    ~Mushroom();
+    int bonk();
+};
+
+class Flower: public Goodie
+{
+public:
+    Flower(int startX, int startY, StudentWorld* world);
+    ~Flower();
+    int bonk();
+};
 
 
 

@@ -288,6 +288,42 @@ void StudentWorld::peachBonk(int x, int y)
                             
                         }
                     }
+                    break;
+                case 3:
+                {
+                    Mushroom *m= new Mushroom((*it)->getX(), (*it)->getY()+8, this);
+                    actors.push_back(m);
+                    break;
+                }
+                case 5:
+                {
+                    Flower *f= new Flower((*it)->getX(), (*it)->getY()+8, this);
+                    actors.push_back(f);
+                    break;
+                }
+                case 6:
+                    (*it)->setStatus(false);
+                    increaseScore(75);
+                    if( peach->getHitPts()==1)
+                    {
+                        peach->addHitPts(1);
+                    }
+                   
+                    peach->setMushroomPower(true);
+                    playSound(SOUND_PLAYER_POWERUP);
+                    break;
+                case 7:
+                    (*it)->setStatus(false);
+                    increaseScore(50);
+                    if( peach->getHitPts()==1)
+                    {
+                        peach->addHitPts(1);
+                    }
+                    peach->setFlowerPower(true);
+                    playSound(SOUND_PLAYER_POWERUP);
+                    break;
+                    
+                    
                 
              
                     

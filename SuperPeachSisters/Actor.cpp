@@ -24,6 +24,7 @@ Actor::Actor( bool status, bool canBeDamaged, bool canShareSpace, int imageID, i
     m_canShareSpace= canShareSpace;
     m_world= world;
     m_firing_delay= 0;
+    m_falling= false;
     
 }
 Actor::~Actor()
@@ -54,6 +55,16 @@ bool Actor::shareSpace()
     return m_canShareSpace;
 }
 
+bool Actor::isFalling()
+{
+    return m_falling;
+}
+
+void Actor::setFalling( bool f)
+{
+    m_falling = f;
+}
+
 void Actor::setStatus(bool status)
 {
     m_status= status;
@@ -72,6 +83,43 @@ int Actor::getFiringDelay()
 bool Actor::isProjectile()
 {
     return false;
+}
+
+void Actor::fall()
+{
+    if( !(getWorld()->isIntersectingSolid(getX(), getY()-2)))
+    {
+      //  std::cerr << "movedown" << std::endl;
+        moveTo(getX(), getY()-2);
+    }
+     if( getDirection()== 0)
+    {
+        if(getWorld()->isIntersectingSolid(getX()+2, getY()))
+        {
+            setStatus(false);
+            return;
+        }
+        else
+        {
+            moveTo(getX()+2, getY());
+        }
+       
+        
+        
+    }
+     else
+     {
+         if(getWorld()->isIntersectingSolid(getX()-2, getY()))
+         {
+            
+             setStatus(false);
+             return;
+         }
+         else
+         {
+             moveTo(getX()-2, getY());
+         }
+     }
 }
 
 
@@ -219,6 +267,87 @@ int Piranha::bonk()
 
 
 
+Goodie::Goodie( int startX, int startY, StudentWorld* world, int imageID):Actor( true, false, true, imageID, startX, startY, 0,1,1,world)
+{
+    
+}
+
+Goodie::~Goodie()
+{
+    
+}
+
+
+
+void Goodie::doSomething()
+{
+    if( !(getWorld()->isIntersectingSolid(getX(), getY()-2)))
+    {
+      //  std::cerr << "movedown" << std::endl;
+        moveTo(getX(), getY()-2);
+    }
+     if( getDirection()== 0)
+    {
+        if(getWorld()->isIntersectingSolid(getX()+2, getY()))
+        {
+            setDirection(180);
+            //return;
+        }
+        else
+        {
+            moveTo(getX()+2, getY());
+        }
+       
+        
+        
+    }
+     else
+     {
+         if(getWorld()->isIntersectingSolid(getX()-2, getY()))
+         {
+            
+             setDirection(0);
+            // return;
+         }
+         else
+         {
+             moveTo(getX()-2, getY());
+         }
+     }
+    }
+    
+
+
+Mushroom::Mushroom(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_MUSHROOM)
+{
+    
+}
+
+Mushroom::~Mushroom()
+{
+    
+}
+
+int Mushroom::bonk()
+{
+    return 6;
+}
+
+Flower::Flower(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_FLOWER)
+{
+    
+}
+
+Flower::~Flower()
+{
+    
+}
+
+int Flower::bonk()
+{
+    return 7;
+}
+
 
 
 
@@ -251,8 +380,8 @@ int Flag::bonk()
         setStatus(false);
        
     }
-   // std::cerr << getWorld()->getScore() << std::endl;
-    return 3;
+    std::cerr << getWorld()->getScore() << std::endl;
+    return 8;
    
 }
 
@@ -295,39 +424,7 @@ Projectiles::~Projectiles()
 
 void Projectiles::doSomething()
 {
-    if( !(getWorld()->isIntersectingSolid(getX(), getY()-2)))
-    {
-      //  std::cerr << "movedown" << std::endl;
-        moveTo(getX(), getY()-2);
-    }
-     if( getDirection()== 0)
-    {
-        if(getWorld()->isIntersectingSolid(getX()+2, getY()))
-        {
-           
-            return;
-        }
-        else
-        {
-            moveTo(getX()+2, getY());
-        }
-       
-        
-        
-    }
-     else
-     {
-         if(getWorld()->isIntersectingSolid(getX()-2, getY()))
-         {
-            
-             setStatus(false);
-             return;
-         }
-         else
-         {
-             moveTo(getX()-2, getY());
-         }
-     }
+    Actor::fall();
    
 }
 
@@ -409,20 +506,24 @@ int Block::bonk()
 {
     if( m_contains_Power)
     {
+        m_contains_Power= false;
         getWorld()->playSound(SOUND_POWERUP_APPEARS);
         if(m_power== 'm')
         {
-            // make mushroom
+            //Mushroom m= new Mushroom(getX(), getY()+8, getWorld());
+            return 3;
         }
         if(m_power== 's')
         {
             // make star
+            return 4;
         }
         if(m_power== 'f')
         {
             // make flower
+            return 5;
         }
-        m_contains_Power= false;
+       
         
         
     }
