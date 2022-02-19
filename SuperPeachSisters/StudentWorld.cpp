@@ -476,8 +476,12 @@ void StudentWorld::damagePeach()
         }
         
     }
+    if(peach->hasStarPower())
+    {
+        return;
+    }
     
-    if( peach->getHitPts()>0&&!peach->hasStarPower() )
+    else if( peach->getHitPts()>0 &&!peach->hasStarPower() )
     {
         playSound(SOUND_PLAYER_HURT);
     }
