@@ -23,6 +23,10 @@ public:
     bool isIntersecting(int x, int y, Actor* it);
     int randDirection();
     void peachBonk( int x, int y);
+    void addToVector( Actor* it);
+    int peachX();
+    int peachY();
+    void damagePeach();
    // void setUp();
 
 private:

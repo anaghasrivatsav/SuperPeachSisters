@@ -27,6 +27,7 @@ public:
     void fall();
     bool isFalling();
     void setFalling(bool f);
+    virtual void setPause( bool f);
     
 
     
@@ -65,6 +66,7 @@ public:
     int getHitPts();
     bool canFire();
     void damagePeach();
+    void setInvincibleTime(int n);
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -97,6 +99,7 @@ public:
     void doSomething();
     virtual int bonk();
     bool isStructure();
+    
 };
 
 class Block: public Pipe
@@ -146,9 +149,12 @@ public:
     ~Enemy();
     virtual void doSomething();
     virtual int bonk();
+    bool pause();
+    void setPause(bool p);
     
 private:
     int m_direction;
+    bool paused;
 
 
 };

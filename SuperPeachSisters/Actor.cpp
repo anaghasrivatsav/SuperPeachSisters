@@ -122,6 +122,11 @@ void Actor::fall()
      }
 }
 
+void Actor::setPause(bool f)
+{
+    
+}
+
 
 
 StudentWorld* Actor::getWorld( )
@@ -137,6 +142,7 @@ StudentWorld* Actor::getWorld( )
 Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, true, imageID, startX, startY, direction, 0,1 , world)
 {
     m_direction= direction;
+    paused= false;
 }
 
 Enemy::~Enemy()
@@ -146,6 +152,16 @@ Enemy::~Enemy()
 
 void Enemy::doSomething()
 {
+    if(!getStatus())
+    {
+        return;
+    }
+    if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
+    {
+        getWorld()->damagePeach();
+        return;
+    }
+  
     if(m_direction==0)
     {
         if( getWorld()->isIntersectingSolid(getX()+1, getY()))
@@ -183,6 +199,7 @@ void Enemy::doSomething()
             }
             
         }
+
                 
    
     
@@ -192,6 +209,16 @@ int Enemy::bonk()
 {
     return 1;
     
+}
+
+bool Enemy::pause()
+{
+    return paused;
+}
+
+void Enemy::setPause( bool p)
+{
+    paused= p;
 }
 
 
@@ -248,6 +275,35 @@ void Piranha::doSomething()
         return;
     }
     increaseAnimationNumber();
+    
+    if( !(getWorld()->peachY() > getY() - 1.5*SPRITE_HEIGHT&&getWorld()->peachY() < getY() + 1.5*SPRITE_HEIGHT))
+    {
+        return;
+    }
+    if(getWorld()->peachX() > getX())
+    {
+        setDirection(0);
+    }
+    else
+    {
+        setDirection(180);
+    }
+    if(getFiringDelay() >0)
+    {
+        
+        setFiringDelay(-1);
+        return;
+    }
+    else if( (getWorld()->peachX() > getX() - 8*SPRITE_WIDTH&&getWorld()->peachX() < getX() + 8*SPRITE_WIDTH))
+    {
+        PiranhaFireball *f = new PiranhaFireball (getX(), getY(), getWorld(), getDirection());
+        getWorld()->addToVector(f);
+        getWorld()->playSound(SOUND_PIRANHA_FIRE);
+         setFiringDelay(40);
+       // std::cerr << "PIRANHA DO SMTH PLEASE"<< std::endl;
+        
+    }
+     
 }
 
 bool Piranha::canFire()
@@ -262,6 +318,16 @@ int Piranha::bonk()
 {
     
     return 1;
+}
+
+void Piranha::setFiringDelay(int x)
+{
+    m_firing_delay= m_firing_delay + x;
+}
+
+int Piranha::getFiringDelay()
+{
+    return m_firing_delay;
 }
 
 
@@ -424,7 +490,19 @@ Projectiles::~Projectiles()
 
 void Projectiles::doSomething()
 {
+    if(!getStatus())
+    {
+        return;
+    }
+    if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
+    {
+        getWorld()->damagePeach();
+        setStatus(false);
+        return;
+    }
     Actor::fall();
+    
+    
    
 }
 
@@ -510,7 +588,8 @@ int Block::bonk()
         getWorld()->playSound(SOUND_POWERUP_APPEARS);
         if(m_power== 'm')
         {
-            //Mushroom m= new Mushroom(getX(), getY()+8, getWorld());
+            Mushroom *m= new Mushroom(getX(), getY()+8, getWorld());
+            getWorld()->addToVector(m);
             return 3;
         }
         if(m_power== 's')
@@ -520,7 +599,9 @@ int Block::bonk()
         }
         if(m_power== 'f')
         {
-            // make flower
+            Flower *f= new Flower(getX(),getY()+8, getWorld());
+            getWorld()->addToVector(f);
+            
             return 5;
         }
        
@@ -606,12 +687,19 @@ void Peach::setStarPower(bool f)
     m_star= f;
 }
 
+void Peach::setInvincibleTime( int n)
+{
+    invincible_time= n;
+}
+
 void Peach::setInvincible(bool f)
 {
     if (f)
     {
         m_invincible = true;
-        invincible_time= 10;
+        setInvincibleTime(10);
+      
+       
     }
     else
     {
@@ -637,30 +725,7 @@ bool Peach:: canFire()
 
 void Peach::damagePeach()
 {
-    addHitPts(-1);
-    if( !isInvincible() && !hasStarPower())
-    {
-        if( hasMushroomPower() || hasFlowerPower())
-        {
-            setMushroomPower(false);
-            setFlowerPower(false);
-            setInvincible(true);
-        }
-    }
-    if( getHitPts()>0)
-    {
-        getWorld()->playSound(SOUND_PLAYER_HURT);
-    }
-    else
-    {
-        getWorld()->playSound(SOUND_PLAYER_DIE);
-        //setStatus(false);
-        //getWorld()->decLives();
-        if( !(getWorld()->getLives() > 0))
-        {
-            //std::cerr<<"PEACH DIED"<< std::endl;
-        }
-    }
+    
 }
 
 void Peach::doSomething()
@@ -673,8 +738,11 @@ void Peach::doSomething()
     
     //temporary invincibility
     if( m_invincible)
+        
     {
+       
         invincible_time--;
+        std::cerr<< invincible_time << std::endl;
         if( invincible_time <= 0)
         {
             m_invincible= false;
@@ -779,7 +847,7 @@ void Peach::doSomething()
                      remaining_jump_distance= 12;
                  }
                  else{
-                     remaining_jump_distance= 12;
+                     remaining_jump_distance= 8;
                  }
                  getWorld()->playSound(SOUND_PLAYER_JUMP);
                  if(getWorld()->isIntersectingSolid(getX() , getY()+4))

@@ -154,9 +154,6 @@ int StudentWorld::init()
     }
 }
 
-    
-
-    //
 
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -189,46 +186,6 @@ int StudentWorld::move()
             it--;
         }
     }
-    
-
-        
-       /* int StudentWorld::move()
-         {
-        // The term "actors" refers to all actors, e.g., Peach, goodies,
-        // enemies, flags, blocks, pipes, fireballs, etc.
-        // Give each actor a chance to do something, incl. Peach
-        for each of the actors in the game world
-        {
-         if (that actor is still active/alive)
-         {
-         // tell that actor to do something (e.g. move)
-         that actor -> doSomething();
-        if (Peach died during this tick) {
-         play dying sound
-        return GWSTATUS_PLAYER_DIED;
-        }
-        if (Peach reached Mario) {
-         play game over sound
-        return GWSTATUS_WON_GAME;
-        }
-        if (Peach competed the current level) {
-        play completed level sound
-        return GWSTATUS_FINISHED_LEVEL;
-        }
-         }
-        }
-        // Remove newly-dead actors after each tick
-        remove dead game objects
-        // Update the game status line
-        update display text // update the score/lives/level text at screen top
-        // the player hasn’t completed the current level and hasn’t died, so
-        // continue playing the current level
-        return GWSTATUS_CONTINUE_GAME;
-         }
-       
-    }*/
-    
-    //decLives();
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -250,13 +207,8 @@ void StudentWorld::peachBonk(int x, int y)
             switch(actor)
             {
                 case 1:
-                   if((*it)->canGetBonked() && isIntersecting(peach->getX(), peach->getY(), (*it)))
-                    {
-                    //std::cerr<< "RAN INTO ENEMY" << std::endl;
-                        peach->damagePeach();
-                    
-                    }
-                    
+                   
+                   /*
                     if( (*it)->canFire())
                     {
                        
@@ -288,19 +240,11 @@ void StudentWorld::peachBonk(int x, int y)
                             
                         }
                     }
+                    */
                     break;
-                case 3:
-                {
-                    Mushroom *m= new Mushroom((*it)->getX(), (*it)->getY()+8, this);
-                    actors.push_back(m);
-                    break;
-                }
-                case 5:
-                {
-                    Flower *f= new Flower((*it)->getX(), (*it)->getY()+8, this);
-                    actors.push_back(f);
-                    break;
-                }
+                    
+                    
+               
                 case 6:
                     (*it)->setStatus(false);
                     increaseScore(75);
@@ -310,6 +254,7 @@ void StudentWorld::peachBonk(int x, int y)
                     }
                    
                     peach->setMushroomPower(true);
+                    
                     playSound(SOUND_PLAYER_POWERUP);
                     break;
                 case 7:
@@ -510,20 +455,6 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
  }
 
 
-
-    
-        
-
-
-/*For the purposes of this project, to determine if two objects A and B overlap, simply
- check to see if their bounding squares overlap. Each object in the game (e.g., a block,
- koopa, Peach, goodies, pipes, fireballs) is represented by a rectangle that is
- SPRITE_WIDTH pixels wide and SPRITE_HEIGHT pixels high. Each object's location
- is denoted by the coordinates of the bottom-left corner of that rectangle. So if an object is
- at location (x,y), it will extend to (x+SPRITE_WIDTH−1, y+SPRITE_HEIGHT−1). It is
- therefore a pretty trivial problem to check if two boxes have any overlap with a few if
- statements. These constants are defined in GameConstants.h.*/
-
 void StudentWorld::cleanUp()
 {
     vector<Actor*>::iterator it;
@@ -535,51 +466,57 @@ void StudentWorld::cleanUp()
     delete peach;
 }
 
+void StudentWorld::addToVector( Actor* it)
+{
+    actors.push_back (it);
+}
+
+int StudentWorld::peachX()
+{
+    return peach->getX();
+}
+
+int StudentWorld::peachY()
+{
+    return peach->getY();
+}
+
+void StudentWorld::damagePeach()
+{
+    if(!peach->isInvincible())
+    {
+        peach->addHitPts(-1);
+    }
+   
+    if( !peach->isInvincible() && !peach->hasStarPower())
+    {
+        if( peach->hasMushroomPower() || peach->hasFlowerPower())
+        {
+            peach->setMushroomPower(false);
+            peach->setFlowerPower(false);
+            peach->setInvincible(true);
+            std::cerr <<"run once"<<std::endl;
+            return;
+        }
+        
+    }
+    
+    if( peach->getHitPts()>0)
+    {
+        playSound(SOUND_PLAYER_HURT);
+    }
+  
+    else
+    {
+        playSound(SOUND_PLAYER_DIE);
+        peach->setStatus(false);
+        decLives();
+        if( !(getLives() > 0))
+        {
+            //std::cerr<<"PEACH DIED"<< std::endl;
+        }
+    }
+}
 
 
 
-
-
-/* #include "Level.h" // required to use our provided class
- void StudentWorld::someFunc()
- {
-  Level lev(assetPath());
-  string level_file = "level01.txt";
-  Level::LoadResult result = lev.loadLevel(level_file);
-  if (result == Level::load_fail_file_not_found)
-  cerr << "Could not find level01.txt data file" << endl;
-  else if (result == Level::load_fail_bad_format)
-  cerr << "level01.txt is improperly formatted" << endl;
-  else if (result == Level::load_success)
-  {
-  cerr << "Successfully loaded level" << endl;
-  Level::GridEntry ge;
-  ge = lev.getContentsOf(5, 10); // x=5, y=10
-switch(ge)
-  {
-  case Level::empty:
-  cout << "Location 5,10 is empty" << endl;
-  break;
-  case Level::koopa:
-  cout << "Location 5,10 starts with a koopa" << endl;
-  break;
-  case Level::goomba:
-  cout << "Location 5,10 starts with a goomba” << endl;
-  break;
-  case Level::peach:
-  cout << "Location 5,10 is where Peach starts" << endl;
-  break;
-  case Level::flag:
-  cout << "Location 5,10 is where a flag is" << endl;
-  break;
-  case Level::block:
-  cout << "Location 5,10 holds a regular block" << endl;
-  break;
-  case Level::star_goodie_block:
-  cout << "Location 5,10 has a star goodie block” << endl;
-  break;
-  // etc…
-  }
-  }
- }
-*/
