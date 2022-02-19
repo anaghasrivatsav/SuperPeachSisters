@@ -69,6 +69,11 @@ int Actor::getFiringDelay()
     return m_firing_delay;
 }
 
+bool Actor::isProjectile()
+{
+    return false;
+}
+
 
 
 StudentWorld* Actor::getWorld( )
@@ -180,7 +185,7 @@ void Koopa::doSomething()
 
 Piranha::Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction):Enemy(  startX, startY, world, imageID, direction)
 {
-    m_firing_delay = 0;
+    //m_firing_delay = 0;
 }
 
 Piranha::~Piranha()
@@ -194,6 +199,7 @@ void Piranha::doSomething()
     {
         return;
     }
+    increaseAnimationNumber();
 }
 
 bool Piranha::canFire()
@@ -206,8 +212,11 @@ bool Piranha::canFire()
 
 int Piranha::bonk()
 {
+    
     return 1;
 }
+
+
 
 
 
@@ -279,6 +288,74 @@ Projectiles::Projectiles( int startX, int startY, StudentWorld* world, int image
     
 }
 
+Projectiles::~Projectiles()
+{
+    
+}
+
+void Projectiles::doSomething()
+{
+    if( !(getWorld()->isIntersectingSolid(getX(), getY()-2)))
+    {
+      //  std::cerr << "movedown" << std::endl;
+        moveTo(getX(), getY()-2);
+    }
+     if( getDirection()== 0)
+    {
+        if(getWorld()->isIntersectingSolid(getX()+2, getY()))
+        {
+           
+            return;
+        }
+        else
+        {
+            moveTo(getX()+2, getY());
+        }
+       
+        
+        
+    }
+     else
+     {
+         if(getWorld()->isIntersectingSolid(getX()-2, getY()))
+         {
+            
+             setStatus(false);
+             return;
+         }
+         else
+         {
+             moveTo(getX()-2, getY());
+         }
+     }
+   
+}
+
+
+
+bool Projectiles::isProjectile()
+{
+    return true;
+}
+
+
+PiranhaFireball::PiranhaFireball( int startX, int startY, StudentWorld* world, int direction):Projectiles( startX, startY, world, IID_PIRANHA_FIRE, direction)
+{
+    
+}
+
+PiranhaFireball::~PiranhaFireball()
+{
+    
+}
+
+int PiranhaFireball::bonk()
+{
+    return 1;
+}
+
+
+
 
 
 
@@ -300,6 +377,11 @@ void Pipe::doSomething()
 
 int Pipe::bonk()
 {
+   
+
+
+        getWorld()->playSound(SOUND_PLAYER_BONK);
+        
     return 2;
 }
 
@@ -324,14 +406,17 @@ void Block::doSomething()
 }
 
 int Block::bonk()
-{
+{std::cerr << "block"<< std::endl;
     if( m_contains_Power)
     {
         getWorld()->playSound(SOUND_POWERUP_APPEARS);
+        std::cerr << "powerup"<< std::endl;
     }
     else
     {
-        getWorld()->playSound(SOUND_PLAYER_KICK);
+        getWorld()->playSound(SOUND_PLAYER_BONK);
+        std::cerr << "blockbonk"<< std::endl;
+        
     }
     return 2;
 }
@@ -434,6 +519,35 @@ bool Peach:: canFire()
     return true;
 }
 
+
+void Peach::damagePeach()
+{
+    addHitPts(-1);
+    if( !isInvincible() && !hasStarPower())
+    {
+        if( hasMushroomPower() || hasFlowerPower())
+        {
+            setMushroomPower(false);
+            setFlowerPower(false);
+            setInvincible(true);
+        }
+    }
+    if( getHitPts()>0)
+    {
+        getWorld()->playSound(SOUND_PLAYER_HURT);
+    }
+    else
+    {
+        getWorld()->playSound(SOUND_PLAYER_DIE);
+        //setStatus(false);
+        //getWorld()->decLives();
+        if( !(getWorld()->getLives() > 0))
+        {
+            //std::cerr<<"PEACH DIED"<< std::endl;
+        }
+    }
+}
+
 void Peach::doSomething()
 {
     if(!getStatus())
@@ -463,12 +577,13 @@ void Peach::doSomething()
               jumpUp++;
           }
           moveTo(getX(), getY()+jumpUp);
-          getWorld()->playSound(SOUND_PLAYER_BONK);
+          getWorld()->peachBonk(getX(), getY());
           remaining_jump_distance= 0;
       }
         else if( m_jumping)
         {
             moveTo(getX(), getY()+4);
+            getWorld()->peachBonk(getX() , getY());
             remaining_jump_distance --;
         }
         if( remaining_jump_distance==0)
@@ -506,7 +621,8 @@ void Peach::doSomething()
              setDirection(180);
              if(getWorld()->isIntersectingSolid(getX() -4, getY()))
              {
-                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
+                 getWorld()->peachBonk(getX()-4 , getY());
+                 
                  break;
                  
              }
@@ -520,7 +636,7 @@ void Peach::doSomething()
              setDirection(0);
              if(getWorld()->isIntersectingSolid(getX() +4, getY()))
              {
-                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
+                 getWorld()->peachBonk(getX()+4 , getY());
                  break;
                  
              }
@@ -530,7 +646,7 @@ void Peach::doSomething()
              }
                 moveTo(getX() +4, getY());
              break;
-             break;
+           
     case KEY_PRESS_UP:
              
              /*if(getWorld()->isIntersectingSolid(getX() , getY()+4))
@@ -551,6 +667,12 @@ void Peach::doSomething()
                      remaining_jump_distance= 12;
                  }
                  getWorld()->playSound(SOUND_PLAYER_JUMP);
+                 if(getWorld()->isIntersectingSolid(getX() , getY()+4))
+                 {
+                     //std::cerr << "should bonk rn" << std::endl;
+                     getWorld()->peachBonk(getX() , getY()+4);
+                     
+                 }
              }
             
              
@@ -570,6 +692,10 @@ void Peach::doSomething()
          
        
      }
+    
+    
+    
+  
     
     /*
     Peach must check to see if she is currently alive. If not, then Peach’s

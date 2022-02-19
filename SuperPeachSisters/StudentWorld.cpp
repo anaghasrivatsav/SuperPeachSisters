@@ -92,7 +92,7 @@ int StudentWorld::init()
                  
                 case Level::star_goodie_block:
                     {
-                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'s', this);
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'s', this);
                         actors.push_back(b);
                         board[x][y]= '*';
                         break;
@@ -107,14 +107,14 @@ int StudentWorld::init()
                
                 case Level::mushroom_goodie_block:
                     {
-                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'m', this);
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'m', this);
                         actors.push_back(b);
                         board[x][y]= '^';
                         break;
                     }
                 case Level::flower_goodie_block:
                     {
-                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,'s', this);
+                        Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'f', this);
                         actors.push_back(b);
                         board[x][y]= '%';
                     }
@@ -182,6 +182,12 @@ int StudentWorld::move()
             }
             
         }
+        else
+        {
+            delete *it;
+            it= actors.erase(it);
+            it--;
+        }
     }
     
 
@@ -236,40 +242,24 @@ void StudentWorld::peachBonk(int x, int y)
     // if shareSpace then call the function's doSomething method
     for( it= actors.begin(); it!=actors.end(); it++)
     {
-        if((*it)->canGetBonked() && isIntersecting(peach->getX(), peach->getY(), (*it)))
+        // used to pass in peach->getX() and peach-> getY() instead of x and y
+        if(((*it)->canGetBonked() && isIntersecting(x, y, (*it))||(*it)->canFire()))
         {
             int actor= (*it)->bonk();
             
             switch(actor)
             {
                 case 1:
+                   if((*it)->canGetBonked() && isIntersecting(peach->getX(), peach->getY(), (*it)))
+                    {
                     //std::cerr<< "RAN INTO ENEMY" << std::endl;
-                    peach->addHitPts(-1);
-                    if( !peach->isInvincible() && !peach->hasStarPower())
-                    {
-                        if( peach->hasMushroomPower() || peach->hasFlowerPower())
-                        {
-                            peach->setMushroomPower(false);
-                            peach->setFlowerPower(false);
-                            peach->setInvincible(true);
-                        }
+                        peach->damagePeach();
+                    
                     }
-                    if( peach->getHitPts()>0)
-                    {
-                        playSound(SOUND_PLAYER_HURT);
-                    }
-                    else
-                    {
-                        playSound(SOUND_PLAYER_DIE);
-                        peach->setStatus(false);
-                        decLives();
-                        if( !(getLives() > 0))
-                        {
-                            //std::cerr<<"PEACH DIED"<< std::endl;
-                        }
-                    }
+                    
                     if( (*it)->canFire())
                     {
+                       
                         if( !(peach->getY() > (*it)->getY() - 1.5*SPRITE_HEIGHT&&peach->getY() < (*it)->getY() + 1.5*SPRITE_HEIGHT))
                         {
                             break;
@@ -279,17 +269,22 @@ void StudentWorld::peachBonk(int x, int y)
                             (*it)->setDirection(0);
                         }
                         else
-                        {(*it)->setDirection(0);
+                        {(*it)->setDirection(180);
                             
                         }
                         if((*it)->getFiringDelay() >0)
                         {
+                            
                             (*it)->setFiringDelay(-1);
                             break;
                         }
-                        else if( (peach->getX() > (*it)->getY() - 8*SPRITE_WIDTH&&peach->getX() < (*it)->getY() + 8*SPRITE_WIDTH))
+                        else if( (peach->getX() > (*it)->getX() - 8*SPRITE_WIDTH&&peach->getX() < (*it)->getX() + 8*SPRITE_WIDTH))
                         {
-                            PiranhaFireball f = new PiranhaFireball ((*it)->getX(), (*it)->getY(), this, IID_PIRANHA_FIRE, (*it)->getDirection());
+                            PiranhaFireball *f = new PiranhaFireball ((*it)->getX(), (*it)->getY(), this, (*it)->getDirection());
+                            actors.push_back(f);
+                            playSound(SOUND_PIRANHA_FIRE);
+                            (*it)-> setFiringDelay(40);
+                           // std::cerr << "PIRANHA DO SMTH PLEASE"<< std::endl;
                             
                         }
                     }
@@ -415,6 +410,8 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
     // if shareSpace then call the function's doSomething method
     for( it= actors.begin(); it!=actors.end(); it++)
     {
+        
+        
         int x_max= x+ SPRITE_WIDTH -1;
         int y_max= y+SPRITE_HEIGHT -1;
         

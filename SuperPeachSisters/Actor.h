@@ -23,6 +23,7 @@ public:
     virtual bool canFire();
     int getFiringDelay();
     void setFiringDelay(int x);
+    virtual bool isProjectile();
 
     
     StudentWorld* getWorld();
@@ -58,6 +59,7 @@ public:
     void addHitPts( int ht);
     int getHitPts();
     bool canFire();
+    void damagePeach();
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -192,6 +194,9 @@ public:
     Projectiles(int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Projectiles();
     void doSomething();
+    virtual int bonk()= 0;
+    bool isProjectile();
+    
     
     
 };
@@ -199,9 +204,10 @@ public:
 class PiranhaFireball:public Projectiles
 {
 public:
-    PiranhaFireball(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    PiranhaFireball(int startX, int startY, StudentWorld* world, int direction);
     ~PiranhaFireball();
-    void doSomething();
+   //void doSomething();
+    virtual int bonk();
    
     
 
