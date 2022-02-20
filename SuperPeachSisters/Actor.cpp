@@ -487,7 +487,7 @@ Star::~Star()
 
 int Star::bonk()
 {
-        return 9;
+    return 9;
 }
 
 

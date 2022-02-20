@@ -31,6 +31,7 @@ public:
     bool hasFlowerPower();
     bool hasMushroomPower();
     bool damageDamagable(int x, int y);
+    void updateText();
    // void setUp();
 
 private:

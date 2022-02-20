@@ -2,6 +2,10 @@
 #include "GameConstants.h"
 #include <string>
 #include "Actor.h"
+#include <iostream> // defines the overloads of the << operator
+#include <sstream>  // defines the type std::ostringstream
+#include <iomanip>  // defines the manipulator setw
+
 
 class Actor;
 
@@ -158,12 +162,76 @@ int StudentWorld::init()
     return GWSTATUS_CONTINUE_GAME;
 }
 
+void StudentWorld::updateText()
+{
+    ostringstream oss;
+    string lives;
+    string level;
+    string score;
+    string starPower;
+    string flowerPower;
+    string mushroomPower;
+    
+    lives= "Lives: ";
+    
+    level= "Level: ";
+    
+    score= "Score: ";
+    
+    starPower= "StarPower!";
+    flowerPower= "ShootPower!";
+    mushroomPower= "JumpPower!";
+    
+    
+    
+        
+    oss << lives << getLives()<< "  "<< level;
+    oss.fill('0');
+    oss << setw(2)<< getLevel();
+    oss << "  "<< score;
+    oss.fill('0');
+    oss << setw(6) << getScore();
+    oss << "  ";
+    //oss.fill('0');
+    if( hasStarPower())
+    {
+        oss << setw(1) << starPower << " ";
+    }
+    if(hasFlowerPower())
+    {
+        oss << setw(1) << flowerPower << " ";
+    }
+    if( hasMushroomPower())
+    {
+        oss << setw(1) << mushroomPower << " ";
+    }
+    
+   
+    
+    string s = oss.str();
+    
+    setGameStatText(s);
+}
+
 int StudentWorld::move()
 {
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
+  
     
-    setGameStatText("lol");
+    /* The status line at the top of the screen must have the following format:
+     Lives: 2 Level: 5 Points: 500 StarPower! ShootPower! JumpPower!
+     Where the items in red are ALWAYS required, and the items in blue are required only if
+     Peach has a particular power. For example, if Peach just has Jump Power, the line might
+     look like this:
+     Lives: 2 Level: 5 Points: 500 JumpPower!
+     Each of the first three stats of the status line must be separated from each other by exactly
+     two spaces. For example, between “Lives: 2” and “Level:” there must be two spaces. The
+     powers (e.g., JumpPower!), if present, must each be separated by a single space, and are
+     separated from the point count by a single space as well. You may find the Stringstreams
+     writeup on the main class web site to be helpful.*/
+    updateText();
+    
     vector<Actor*>::iterator it;
     if((*peach).getStatus())
     {
@@ -238,6 +306,7 @@ void StudentWorld::peachBonk(int x, int y)
                 case 9:
                     (*it)->setStatus(false);
                     increaseScore(100);
+                    
                     if( peach->getHitPts()==1)
                     {
                         peach->addHitPts(1);
