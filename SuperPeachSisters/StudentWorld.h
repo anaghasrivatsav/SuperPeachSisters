@@ -30,6 +30,7 @@ public:
     bool hasStarPower();
     bool hasFlowerPower();
     bool hasMushroomPower();
+    bool damageDamagable(int x, int y);
    // void setUp();
 
 private:
@@ -50,10 +51,9 @@ private:
 
 //THINGS TO DO STILL
 // update text at the top
-// koopa shell
-// peach fireball
+// increase level
 // check spec again later
-// if player has starpower i need to damage the enemy
+
 
 
 // What i need to do for init

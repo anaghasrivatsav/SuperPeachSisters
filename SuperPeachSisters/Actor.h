@@ -21,13 +21,14 @@ public:
     void setStatus( bool status);
     virtual bool canGetBonked();
     virtual bool canFire();
-    int getFiringDelay();
-    void setFiringDelay(int x);
+    virtual int getFiringDelay();
+    virtual void setFiringDelay(int x);
     virtual bool isProjectile();
     void fall();
     bool isFalling();
     void setFalling(bool f);
     virtual void setPause( bool f);
+    virtual bool createsShell();
     
 
     
@@ -68,6 +69,9 @@ public:
     void damagePeach();
     void setInvincibleTime(int n);
     int getStarTime( );
+    void setFiringDelay(int x);
+    int getFiringDelay();
+    bool isProjectile();
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -84,6 +88,7 @@ private:
     bool m_falling;
     int remaining_jump_distance;
     int remaining_star_time;
+    
     
    
     
@@ -153,6 +158,7 @@ public:
     virtual int bonk();
     bool pause();
     void setPause(bool p);
+    virtual bool createsShell();
     
 private:
     int m_direction;
@@ -178,6 +184,7 @@ public:
     Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction);
     ~Koopa();
     void doSomething();
+    bool createsShell();
 
     //void bonk();
     
@@ -229,6 +236,15 @@ class KoopaShell: public Projectiles
 public:
     KoopaShell(int startX, int startY, StudentWorld* world, int direction);
     ~KoopaShell();
+    void doSomething();
+    virtual int bonk();
+};
+
+class PeachFireball: public Projectiles
+{
+public:
+    PeachFireball(int startX, int startY, StudentWorld* world, int direction);
+    ~PeachFireball();
     void doSomething();
     virtual int bonk();
 };

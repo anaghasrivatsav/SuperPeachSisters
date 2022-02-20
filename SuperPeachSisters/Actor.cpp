@@ -77,7 +77,7 @@ void Actor::setFiringDelay(int x)
 
 int Actor::getFiringDelay()
 {
-    std::cerr <<m_firing_delay<< std::endl;
+    //std::cerr <<m_firing_delay<< std::endl;
     return m_firing_delay;
 }
 
@@ -128,6 +128,12 @@ void Actor::setPause(bool f)
     
 }
 
+bool Actor::createsShell()
+{
+    return false;
+}
+
+
 
 
 StudentWorld* Actor::getWorld( )
@@ -163,6 +169,12 @@ void Enemy::doSomething()
         {
             getWorld()->playSound(SOUND_PLAYER_KICK);
             setStatus(false);
+            getWorld()->increaseScore(100);
+            if (createsShell())
+            {
+                KoopaShell *s= new KoopaShell(getX(), getY(), getWorld(), getDirection() );
+                getWorld()->addToVector(s);
+            }
             return;
         }
         else
@@ -232,6 +244,11 @@ void Enemy::setPause( bool p)
     paused= p;
 }
 
+bool Enemy::createsShell()
+{
+    return false;
+}
+
 
 
 
@@ -264,14 +281,21 @@ Koopa::~Koopa()
     
 }
 
+bool Koopa::createsShell()
+{
+    return true;
+}
+
 void Koopa::doSomething()
 {
     Enemy::doSomething();
     if( getStatus()== false)
     {
-        // create a shell
+        return;
     }
 }
+
+
 
 Piranha::Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction):Enemy(  startX, startY, world, imageID, direction)
 {
@@ -321,12 +345,12 @@ void Piranha::doSomething()
     }
     if(getFiringDelay()==0)
     {
-        std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
+        //std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
     }
     if(getFiringDelay() >0)
     {
         
-        std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
+        //std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
         setFiringDelay(-1);
         return;
     }
@@ -495,6 +519,7 @@ int Flag::bonk()
     if(getStatus())
     {
         getWorld()->increaseScore(1000);
+        getWorld()->playSound(SOUND_FINISHED_LEVEL);
         setStatus(false);
        
     }
@@ -530,7 +555,7 @@ void Mario::doSomething()
 
 //PROJECTILES
 
-Projectiles::Projectiles( int startX, int startY, StudentWorld* world, int imageID, int direction):Actor( true, true, true, imageID, startX, startY, direction, 1,1, world)
+Projectiles::Projectiles( int startX, int startY, StudentWorld* world, int imageID, int direction):Actor( true, false, true, imageID, startX, startY, direction, 1,1, world)
 {
     
 }
@@ -544,9 +569,7 @@ void Projectiles::doSomething()
 {
    
     Actor::fall();
-    
-    
-   
+     
 }
 
 
@@ -590,7 +613,67 @@ int PiranhaFireball::bonk()
         Projectiles::doSomething();
     }
 
+KoopaShell::KoopaShell(int startX, int startY, StudentWorld* world, int direction):Projectiles( startX, startY, world, IID_SHELL, direction)
+{
+    
+}
 
+KoopaShell::~KoopaShell()
+{
+    
+}
+
+void KoopaShell::doSomething()
+{
+    
+    if(!getStatus())
+    {
+        return;
+    }
+    bool b= getWorld()->damageDamagable(getX(), getY());
+    if(b)
+    {//std::cerr << "created"<<std::endl;
+       
+        setStatus(false);
+        return;
+    }
+    Projectiles::doSomething();
+    
+}
+
+int KoopaShell::bonk()
+{
+    return 10;
+}
+
+PeachFireball::PeachFireball( int startX, int startY, StudentWorld* world, int direction):Projectiles( startX, startY,world, IID_PEACH_FIRE, direction)
+{
+    
+}
+PeachFireball::~PeachFireball()
+{
+    
+}
+void PeachFireball::doSomething()
+{
+    if(!getStatus())
+    {
+        return;
+    }
+    bool b= getWorld()->damageDamagable(getX(), getY());
+    if(b)
+    {//std::cerr << "created"<<std::endl;
+       
+        setStatus(false);
+        return;
+    }
+    Projectiles::doSomething();
+}
+
+int PeachFireball::bonk()
+{
+    return 11;
+}
 
 
 
@@ -790,10 +873,22 @@ bool Peach:: canFire()
 }
 
 
-void Peach::damagePeach()
+void Peach::setFiringDelay( int x)
 {
-    
+    time_to_recharge_before_next_fire= time_to_recharge_before_next_fire +x;
 }
+
+int Peach::getFiringDelay()
+{
+    return time_to_recharge_before_next_fire;
+}
+
+bool Peach::isProjectile()
+{
+    return false;
+}
+
+
 
 void Peach::doSomething()
 {
@@ -809,6 +904,11 @@ void Peach::doSomething()
         {
             setStarPower(false);
         }
+    }
+    if ( getFiringDelay()>0)
+    {
+       // std::cerr <<getFiringDelay()<<"FIRING DELAY"<< std::endl;
+        setFiringDelay(-1);
     }
     
     //temporary invincibility
@@ -931,10 +1031,45 @@ void Peach::doSomething()
                      getWorld()->peachBonk(getX() , getY()+4);
                      
                  }
+        
              }
+        
             
              
              break;
+    case KEY_PRESS_SPACE:
+             if(!hasFlowerPower())
+             {
+                 break;
+             }
+             if ( getFiringDelay()>0)
+             {
+                 //std::cerr <<getFiringDelay()<<"FIRING DELAY"<< std::endl;
+                 //setFiringDelay(-1);
+                 break;
+             }
+             else
+             {
+                 getWorld()->playSound( SOUND_PLAYER_FIRE);
+                
+                 
+                 int spacing ;
+                 if (getDirection()== 0)
+                 {
+                     spacing= 4;
+                 }
+                 else
+                 {
+                     spacing = -4;
+                 }
+                 PeachFireball *fp = new PeachFireball( getX()+spacing ,getY(), getWorld(), getDirection() );
+                 getWorld()->addToVector(fp);
+                 setFiringDelay(8);
+                 
+             }
+             break;
+             
+             
    /* case KEY_PRESS_DOWN:
              if(getWorld()->isIntersectingSolid(getX() , getY()-4))
              {

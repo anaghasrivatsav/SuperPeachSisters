@@ -162,6 +162,8 @@ int StudentWorld::move()
 {
     // This code is here merely to allow the game to build, run, and terminate after you hit enter.
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
+    
+    setGameStatText("lol");
     vector<Actor*>::iterator it;
     if((*peach).getStatus())
     {
@@ -350,6 +352,35 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
      
 }
 
+bool StudentWorld::damageDamagable( int x, int y)
+{
+    vector<Actor*>::iterator it;
+     
+    bool b= false;
+  
+     
+    // if shareSpace then call the function's doSomething method
+    for( it= actors.begin(); it!=actors.end(); it++)
+    {
+        
+        if (isIntersecting(x, y, (*it)) && (*it)->getStatus())
+        {
+            if((*it)->damagable())
+            {
+                (*it)->setStatus(false);
+                b= true;
+                increaseScore(100);
+                if( (*it)->createsShell())
+                {
+                    KoopaShell *s= new KoopaShell((*it)->getX(), (*it)->getY(), this, (*it)->getDirection() );
+                    addToVector(s);
+                }
+            }
+        }
+    }
+    return b;
+}
+
 
 
 
@@ -504,7 +535,7 @@ void StudentWorld::damagePeach()
         playSound(SOUND_PLAYER_DIE);
         peach->setStatus(false);
         decLives();
-        std::cerr<<getLives() <<"NUMBER OF LIVES"<< std::endl;
+        //std::cerr<<getLives() <<"NUMBER OF LIVES"<< std::endl;
         if( !(getLives() > 0))
         {
             
