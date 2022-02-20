@@ -27,6 +27,9 @@ public:
     int peachX();
     int peachY();
     void damagePeach();
+    bool hasStarPower();
+    bool hasFlowerPower();
+    bool hasMushroomPower();
    // void setUp();
 
 private:
@@ -37,6 +40,20 @@ private:
 };
 
 #endif // STUDENTWORLD_H_
+
+
+
+//BUGS TO FIX
+
+// piranha fireball not firing properly for whatever reason
+// fix: i think i need to check how the piranha fireball looks for peach bc smth is wrong
+
+//THINGS TO DO STILL
+// update text at the top
+// koopa shell
+// peach fireball
+// check spec again later
+// if player has starpower i need to damage the enemy
 
 
 // What i need to do for init

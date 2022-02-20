@@ -430,6 +430,19 @@ bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
      return false;
  }
 
+bool StudentWorld:: hasStarPower()
+{
+    return( peach->hasStarPower());
+}
+bool StudentWorld::hasFlowerPower()
+{
+    return ( peach->hasFlowerPower());
+}
+bool StudentWorld::hasMushroomPower()
+{
+    return( peach->hasMushroomPower());
+}
+
 
 void StudentWorld::cleanUp()
 {
@@ -489,11 +502,12 @@ void StudentWorld::damagePeach()
     else
     {
         playSound(SOUND_PLAYER_DIE);
-       // peach->setStatus(false);
-       // decLives();
+        peach->setStatus(false);
+        decLives();
+        std::cerr<<getLives() <<"NUMBER OF LIVES"<< std::endl;
         if( !(getLives() > 0))
         {
-            //std::cerr<<"PEACH DIED"<< std::endl;
+            
         }
     }
 }

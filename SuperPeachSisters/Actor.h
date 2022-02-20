@@ -219,9 +219,18 @@ class PiranhaFireball:public Projectiles
 public:
     PiranhaFireball(int startX, int startY, StudentWorld* world, int direction);
     ~PiranhaFireball();
-   //void doSomething();
+   void doSomething();
     virtual int bonk();
    
+};
+
+class KoopaShell: public Projectiles
+{
+public:
+    KoopaShell(int startX, int startY, StudentWorld* world, int direction);
+    ~KoopaShell();
+    void doSomething();
+    virtual int bonk();
 };
 
 //GOODIES

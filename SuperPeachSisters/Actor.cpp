@@ -77,6 +77,7 @@ void Actor::setFiringDelay(int x)
 
 int Actor::getFiringDelay()
 {
+    std::cerr <<m_firing_delay<< std::endl;
     return m_firing_delay;
 }
 
@@ -158,8 +159,18 @@ void Enemy::doSomething()
     }
     if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
     {
-        getWorld()->damagePeach();
-        return;
+        if( getWorld()->hasStarPower())
+        {
+            getWorld()->playSound(SOUND_PLAYER_KICK);
+            setStatus(false);
+            return;
+        }
+        else
+        {
+            getWorld()->damagePeach();
+            return;
+        }
+        
     }
   
     if(m_direction==0)
@@ -256,11 +267,15 @@ Koopa::~Koopa()
 void Koopa::doSomething()
 {
     Enemy::doSomething();
+    if( getStatus()== false)
+    {
+        // create a shell
+    }
 }
 
 Piranha::Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction):Enemy(  startX, startY, world, imageID, direction)
 {
-    //m_firing_delay = 0;
+    m_firing_delay = 0;
 }
 
 Piranha::~Piranha()
@@ -270,13 +285,29 @@ Piranha::~Piranha()
 
 void Piranha::doSomething()
 {
+   
     if (!getStatus())
     {
         return;
     }
     increaseAnimationNumber();
+    if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
+    {
+        if( getWorld()->hasStarPower())
+        {
+            getWorld()->playSound(SOUND_PLAYER_KICK);
+            setStatus(false);
+            return;
+        }
+        else
+        {
+            getWorld()->damagePeach();
+            return;
+        }
+        
+    }
     
-    if( !(getWorld()->peachY() > getY() - 1.5*SPRITE_HEIGHT&&getWorld()->peachY() < getY() + 1.5*SPRITE_HEIGHT))
+    if( !(getWorld()->peachY() > (getY() - 1.5*SPRITE_HEIGHT)&&getWorld()->peachY() < (getY() + 1.5*SPRITE_HEIGHT)))
     {
         return;
     }
@@ -288,9 +319,14 @@ void Piranha::doSomething()
     {
         setDirection(180);
     }
+    if(getFiringDelay()==0)
+    {
+        std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
+    }
     if(getFiringDelay() >0)
     {
         
+        std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
         setFiringDelay(-1);
         return;
     }
@@ -299,10 +335,11 @@ void Piranha::doSomething()
         PiranhaFireball *f = new PiranhaFireball (getX(), getY(), getWorld(), getDirection());
         getWorld()->addToVector(f);
         getWorld()->playSound(SOUND_PIRANHA_FIRE);
-         setFiringDelay(40);
-       // std::cerr << "PIRANHA DO SMTH PLEASE"<< std::endl;
+        setFiringDelay(40);
+       
         
     }
+   // std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
      
 }
 
@@ -505,16 +542,7 @@ Projectiles::~Projectiles()
 
 void Projectiles::doSomething()
 {
-    if(!getStatus())
-    {
-        return;
-    }
-    if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
-    {
-        getWorld()->damagePeach();
-        setStatus(false);
-        return;
-    }
+   
     Actor::fall();
     
     
@@ -541,9 +569,26 @@ PiranhaFireball::~PiranhaFireball()
 
 int PiranhaFireball::bonk()
 {
+    
     return 1;
 }
 
+    void PiranhaFireball::doSomething()
+    {
+        
+        if(!getStatus())
+        {
+            return;
+        }
+        if(getWorld()->isIntersecting(getWorld()->peachX(), getWorld()->peachY(), this))
+        {
+            getWorld()->damagePeach();
+            setStatus(false);
+            return;
+        }
+        
+        Projectiles::doSomething();
+    }
 
 
 
@@ -772,7 +817,7 @@ void Peach::doSomething()
     {
        
         invincible_time--;
-        std::cerr<< invincible_time << std::endl;
+       // std::cerr<< invincible_time << std::endl;
         if( invincible_time <= 0)
         {
             m_invincible= false;
