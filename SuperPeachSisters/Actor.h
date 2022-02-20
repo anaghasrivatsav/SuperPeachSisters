@@ -30,6 +30,7 @@ public:
     virtual void setPause( bool f);
     virtual bool createsShell();
     
+    
 
     
     StudentWorld* getWorld();
@@ -72,6 +73,8 @@ public:
     void setFiringDelay(int x);
     int getFiringDelay();
     bool isProjectile();
+    bool finishedLevel();
+    void setFinishedLevel(bool b);
     //void bonk();
     //StudentWorld* getWorld();
     
@@ -88,6 +91,7 @@ private:
     bool m_falling;
     int remaining_jump_distance;
     int remaining_star_time;
+    bool m_finished;
     
     
    

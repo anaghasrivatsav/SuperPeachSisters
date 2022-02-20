@@ -34,7 +34,8 @@ int StudentWorld::init()
 {
     
     Level lev(assetPath());
-    string level_file = "level01.txt";
+    string level_file = levelString();
+    std::cerr<< level_file;
     Level::LoadResult result = lev.loadLevel(level_file);
     if (result == Level::load_fail_file_not_found)
     {
@@ -48,7 +49,6 @@ int StudentWorld::init()
         cerr << "level01.txt is improperly formatted" << endl;
         return GWSTATUS_LEVEL_ERROR;
     }
-
     else if (result == Level::load_success)
     {
     cerr << "Successfully loaded level" << endl;
@@ -256,6 +256,12 @@ int StudentWorld::move()
             it--;
         }
     }
+    if( peach->finishedLevel())
+    {
+        peach->setFinishedLevel(false);
+        return GWSTATUS_FINISHED_LEVEL;
+
+    }
     return GWSTATUS_CONTINUE_GAME;
 }
 
@@ -339,6 +345,24 @@ int StudentWorld::randDirection()
         return 180;
     }
         
+}
+
+void StudentWorld::nextLevel()
+{
+   
+    peach->setFinishedLevel(true);
+  
+}
+
+string StudentWorld::levelString()
+{
+    ostringstream oss;
+    oss<<"level";
+    oss.fill('0');
+    oss << setw(2)<< getLevel();
+    oss<<".txt";
+    string s= oss.str();
+    return s;
 }
 
 bool StudentWorld::isIntersecting( int x, int y,  Actor* it)

@@ -521,6 +521,8 @@ int Flag::bonk()
         getWorld()->increaseScore(1000);
         getWorld()->playSound(SOUND_FINISHED_LEVEL);
         setStatus(false);
+        getWorld()->nextLevel();
+       
        
     }
     std::cerr << getWorld()->getScore() << std::endl;
@@ -781,6 +783,7 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
     remaining_jump_distance= 300;
     m_falling= false;
     remaining_star_time= 0;
+    m_finished= false;
     
     
     
@@ -870,6 +873,16 @@ int Peach:: getHitPts()
 bool Peach:: canFire()
 {
     return true;
+}
+
+bool Peach:: finishedLevel()
+{
+    return m_finished;
+}
+
+void Peach::setFinishedLevel(bool b)
+{
+    m_finished= b;
 }
 
 

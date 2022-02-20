@@ -32,6 +32,8 @@ public:
     bool hasMushroomPower();
     bool damageDamagable(int x, int y);
     void updateText();
+    std::string levelString();
+    void nextLevel();
    // void setUp();
 
 private:
