@@ -17,7 +17,7 @@ public:
     bool damagable();
     bool shareSpace();
     virtual void doSomething()=0;
-    virtual int bonk()=0;
+    virtual void bonk()=0;
     void setStatus( bool status);
     virtual bool canGetBonked();
     virtual bool canFire();
@@ -27,7 +27,6 @@ public:
     void fall();
     bool isFalling();
     void setFalling(bool f);
-    virtual void setPause( bool f);
     virtual bool createsShell();
     
     
@@ -49,12 +48,193 @@ private:
     
 };
 
+
+//Enemies
+ class Enemy:public Actor
+{
+public:
+    Enemy( int startX, int startY, StudentWorld* world, int imageID, int direction);
+    virtual~Enemy();
+    virtual void doSomething();
+    virtual void bonk();
+    
+private:
+    int m_direction;
+
+
+};
+
+class Goomba:public Enemy
+{
+public:
+    Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction);
+    virtual~Goomba();
+    void doSomething();
+   
+    //void bonk();
+    
+};
+
+class Koopa:public Enemy
+{
+public:
+    Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction);
+    virtual~Koopa();
+    void doSomething();
+    bool createsShell();
+
+    //void bonk();
+    
+};
+
+class Piranha:public Enemy
+{
+public:
+    Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    virtual~Piranha();
+    void doSomething();
+    int getFiringDelay();
+    void setFiringDelay(int x);
+    bool canFire();
+    
+private:
+    int m_firing_delay;
+};
+
+//GOODIES
+class Goodie:public Actor
+{
+public:
+    Goodie(int startX, int startY, StudentWorld* world,  int imageID);
+    virtual~Goodie();
+    virtual void bonk()= 0;
+    void doSomething();
+    
+};
+
+
+class Mushroom: public Goodie
+{
+public:
+    Mushroom(int startX, int startY, StudentWorld* world);
+    virtual~Mushroom();
+    void bonk();
+};
+
+class Flower: public Goodie
+{
+public:
+    Flower(int startX, int startY, StudentWorld* world);
+    virtual~Flower();
+    void bonk();
+};
+
+class Star: public Goodie
+{
+public:
+    Star( int startX, int startY, StudentWorld* world);
+    virtual~Star();
+    void bonk();
+};
+
+
+//Goals
+class Flag: public Actor
+{
+public:
+    Flag( int startX, int startY, StudentWorld* world ,int imageId);
+    virtual ~Flag();
+    void doSomething();
+    void bonk();
+    bool isFlag();
+};
+
+class Mario:public Flag
+{
+public:
+    Mario(int startX, int startY, StudentWorld* world);
+    virtual~Mario();
+    void doSomething();
+    void bonk();
+};
+
+
+//Structures
+class Pipe: public Actor
+{
+public:
+    Pipe(int startX, int startY, StudentWorld* world, int imageID);
+    virtual~Pipe();
+    void doSomething();
+    virtual void bonk();
+    bool isStructure();
+    
+};
+
+class Block: public Pipe
+{
+public:
+    Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
+    virtual~Block();
+    void doSomething();
+    void bonk();
+    bool isStructure();
+private:
+    bool m_contains_Power;
+    char m_power;
+};
+
+
+//PROJECTILES
+
+class Projectiles:public Actor
+{
+public:
+    Projectiles(int startX, int startY, StudentWorld* world, int imageID, int direction);
+    virtual~Projectiles();
+    void doSomething();
+    virtual void bonk()= 0;
+    bool isProjectile();
+    
+};
+
+class PiranhaFireball:public Projectiles
+{
+public:
+    PiranhaFireball(int startX, int startY, StudentWorld* world, int direction);
+    virtual~PiranhaFireball();
+   void doSomething();
+    virtual void bonk();
+   
+};
+
+class KoopaShell: public Projectiles
+{
+public:
+    KoopaShell(int startX, int startY, StudentWorld* world, int direction);
+    virtual~KoopaShell();
+    void doSomething();
+    virtual void bonk();
+};
+
+class PeachFireball: public Projectiles
+{
+public:
+    PeachFireball(int startX, int startY, StudentWorld* world, int direction);
+    virtual~PeachFireball();
+    void doSomething();
+    virtual void bonk();
+};
+
+
+
+
 class Peach: public Actor
 {
 public:
     Peach(int startX ,int startY, StudentWorld *world);
     ~Peach();
-     int bonk();
+     void bonk();
     void doSomething();
     bool isInvincible();
     bool hasStarPower();
@@ -75,8 +255,6 @@ public:
     bool isProjectile();
     bool finishedLevel();
     void setFinishedLevel(bool b);
-    //void bonk();
-    //StudentWorld* getWorld();
     
     
 private:
@@ -92,211 +270,7 @@ private:
     int remaining_jump_distance;
     int remaining_star_time;
     bool m_finished;
-    
-    
-   
-    
-    
-    
 };
 
-
-
-class Pipe: public Actor
-{
-public:
-    Pipe(int startX, int startY, StudentWorld* world, int imageID);
-    ~Pipe();
-    void doSomething();
-    virtual int bonk();
-    bool isStructure();
-    
-};
-
-class Block: public Pipe
-{
-public:
-    Block( int startX, int startY, bool contains_power, char power, StudentWorld* world);
-    ~Block();
-    void doSomething();
-    int bonk();
-    bool isStructure();
-private:
-    bool m_contains_Power;
-    char m_power;
-};
-
-class Flag: public Actor
-{
-public:
-    Flag( int startX, int startY, StudentWorld* world ,int imageId);
-    virtual ~Flag();
-    void doSomething();
-    int bonk();
-    bool isFlag();
-
-    
-};
-
-class Mario:public Flag
-{
-public:
-    Mario(int startX, int startY, StudentWorld* world);
-    ~Mario();
-    void doSomething();
-    int bonk();
-};
-
-    
-    // peach properties
-    // hit points
-    //
-
-//Enemies
- class Enemy:public Actor
-{
-public:
-    Enemy( int startX, int startY, StudentWorld* world, int imageID, int direction);
-    ~Enemy();
-    virtual void doSomething();
-    virtual int bonk();
-    bool pause();
-    void setPause(bool p);
-    virtual bool createsShell();
-    
-private:
-    int m_direction;
-    bool paused;
-
-
-};
-
-class Goomba:public Enemy
-{
-public:
-    Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction);
-    ~Goomba();
-    void doSomething();
-   
-    //void bonk();
-    
-};
-
-class Koopa:public Enemy
-{
-public:
-    Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction);
-    ~Koopa();
-    void doSomething();
-    bool createsShell();
-
-    //void bonk();
-    
-};
-
-class Piranha:public Enemy
-{
-public:
-    Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction);
-    ~Piranha();
-    void doSomething();
-    int getFiringDelay();
-    void setFiringDelay(int x);
-    int bonk();
-    bool canFire();
-    
-private:
-    int m_firing_delay;
-};
-
-
-//PROJECTILES
-
-class Projectiles:public Actor
-{
-public:
-    Projectiles(int startX, int startY, StudentWorld* world, int imageID, int direction);
-    ~Projectiles();
-    void doSomething();
-    virtual int bonk()= 0;
-    bool isProjectile();
-    
-    
-    
-};
-
-class PiranhaFireball:public Projectiles
-{
-public:
-    PiranhaFireball(int startX, int startY, StudentWorld* world, int direction);
-    ~PiranhaFireball();
-   void doSomething();
-    virtual int bonk();
-   
-};
-
-class KoopaShell: public Projectiles
-{
-public:
-    KoopaShell(int startX, int startY, StudentWorld* world, int direction);
-    ~KoopaShell();
-    void doSomething();
-    virtual int bonk();
-};
-
-class PeachFireball: public Projectiles
-{
-public:
-    PeachFireball(int startX, int startY, StudentWorld* world, int direction);
-    ~PeachFireball();
-    void doSomething();
-    virtual int bonk();
-};
-
-//GOODIES
-
-class Goodie:public Actor
-{
-public:
-    Goodie(int startX, int startY, StudentWorld* world,  int imageID);
-    ~Goodie();
-    virtual int bonk()= 0;
-    void doSomething();
-    
-};
-
-
-class Mushroom: public Goodie
-{
-public:
-    Mushroom(int startX, int startY, StudentWorld* world);
-    ~Mushroom();
-    int bonk();
-};
-
-class Flower: public Goodie
-{
-public:
-    Flower(int startX, int startY, StudentWorld* world);
-    ~Flower();
-    int bonk();
-};
-
-class Star: public Goodie
-{
-public:
-    Star( int startX, int startY, StudentWorld* world);
-    ~Star();
-    int bonk();
-};
-
-
-
-// keep track of attributes of each of these objects
-
-// Each object must have the following base properties
-// alive/dead status, damageable, whether something can move into its space
-
-// doSomething function
 
 #endif // ACTOR_H_

@@ -21,8 +21,6 @@ GameWorld* createStudentWorld(string assetPath)
 StudentWorld::StudentWorld(string assetPath)
 : GameWorld(assetPath)
 {
-    //m_score= 0;
-   // m_lives= 3;
 }
 
 StudentWorld::~StudentWorld()
@@ -61,36 +59,40 @@ int StudentWorld::init()
               switch(ge)
                 {
                     case Level::empty:{
-                        board[x][y]= ' ';
+                     
                         
-                        break;}
+                        break;
+                        
+                    }
                     case Level::peach:{
                         Peach *p= new Peach(x*SPRITE_WIDTH,y*SPRITE_HEIGHT, this);
                         peach= p;
-                       // actors.push_back(p);
-                        board[x][y]= '@';
+                      
+                       
                         
                         break;}
                    
-                    case Level::block:{
+                    case Level::block:
+                    {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,false,' ', this);
                         actors.push_back(b);
-                        board[x][y]= '#';
-                        break;}
-                    default:{
-                        break;}
+                       
+                        break;
+                        
+                    }
+                   
                 case Level::koopa:
                     {
                         Koopa *k = new Koopa(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_KOOPA, randDirection() );
                         actors.push_back(k);
-                        board[x][y]= 'k';
+                      
                         break;
                     }
                 case Level::goomba:
                     {
                         Goomba *g = new Goomba(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_GOOMBA, randDirection() );
                         actors.push_back(g);
-                        board[x][y]= 'g';
+                       
                         break;
                     }
                  
@@ -98,14 +100,14 @@ int StudentWorld::init()
                     {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'s', this);
                         actors.push_back(b);
-                        board[x][y]= '*';
+                       
                         break;
                     }
                case Level::piranha:
                     {
                         Piranha *p = new Piranha(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,this, IID_PIRANHA, randDirection() );
                         actors.push_back(p);
-                        board[x][y]= 'p';
+                        
                         break;
                     }
                
@@ -113,23 +115,24 @@ int StudentWorld::init()
                     {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'m', this);
                         actors.push_back(b);
-                        board[x][y]= '^';
+                   
                         break;
                     }
                 case Level::flower_goodie_block:
                     {
                         Block *b= new Block(x*SPRITE_WIDTH,y*SPRITE_HEIGHT,true,'f', this);
                         actors.push_back(b);
-                        board[x][y]= '%';
-                    }
                         break;
+                       
+                    }
+                        
                  
                         
                 case Level::pipe:
                     {
                         Pipe *p= new Pipe(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this, IID_PIPE );
                         actors.push_back(p);
-                        board[x][y]= 'I';
+                        
                         break;
                     }
                
@@ -139,13 +142,13 @@ int StudentWorld::init()
                     
                         Mario *m= new Mario(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this );
                         actors.push_back(m);
-                        board[x][y]= 'm';
+                        
                         break;
                     }
                 case Level::flag:
                         Flag *f= new Flag(x*SPRITE_WIDTH, y*SPRITE_HEIGHT,this , IID_FLAG);
                         actors.push_back(f);
-                        board[x][y]= 'f';
+                      
                         break;
                         
                 
@@ -268,66 +271,13 @@ int StudentWorld::move()
 void StudentWorld::peachBonk(int x, int y)
 {
     vector<Actor*>::iterator it;
-     
-     
-     
-     
     // if shareSpace then call the function's doSomething method
     for( it= actors.begin(); it!=actors.end(); it++)
     {
         // used to pass in peach->getX() and peach-> getY() instead of x and y
         if(((*it)->canGetBonked() && isIntersecting(x, y, (*it))||(*it)->canFire()))
         {
-            int actor= (*it)->bonk();
-            
-            switch(actor)
-            {
-                    
-                
-                    
-                    
-               
-                case 6:
-                    (*it)->setStatus(false);
-                    increaseScore(75);
-                    if( peach->getHitPts()==1)
-                    {
-                        peach->addHitPts(1);
-                    }
-                   
-                    peach->setMushroomPower(true);
-                    
-                    playSound(SOUND_PLAYER_POWERUP);
-                    break;
-                case 7:
-                    (*it)->setStatus(false);
-                    increaseScore(50);
-                    if( peach->getHitPts()==1)
-                    {
-                        peach->addHitPts(1);
-                    }
-                    peach->setFlowerPower(true);
-                    playSound(SOUND_PLAYER_POWERUP);
-                    break;
-                case 9:
-                    (*it)->setStatus(false);
-                    increaseScore(100);
-                    
-                    if( peach->getHitPts()==1)
-                    {
-                        peach->addHitPts(1);
-                    }
-                    peach->setStarPower(true);
-                    playSound(SOUND_PLAYER_POWERUP);
-                    break;
-                    
-                    
-                
-             
-                    
-            }
-               
-            
+             (*it)->bonk();
         }
     }
     
@@ -367,39 +317,6 @@ string StudentWorld::levelString()
 
 bool StudentWorld::isIntersecting( int x, int y,  Actor* it)
 {
-    /*
-    
-    int x_max= x+ SPRITE_WIDTH -1;
-    int y_max= y+SPRITE_HEIGHT -1;
-    
-    int x1= (*it).getX();
-    int y1= (*it).getY();
-    
-    int x1_max= x1+ SPRITE_WIDTH -1;
-    int y1_max= y1+SPRITE_HEIGHT -1;
-    
-    
-    if(x<=x1 && x1<= x_max && y<= y1 && y1<= y_max)
-    {
-        return true;
-    }
-    
-    if(x<=x1 && x1<= x_max && y1<= y && y<= y_max)
-    {
-        return true;
-    }
-    
-    if(x1<= x && x<= x1_max && y1<= y && y<= y_max)
-    {
-        return true;
-    }
-    
-    if(x1<= x && x<= x1_max && y<= y1 && y1<= y_max)
-    {
-        return true;
-    }
-    return false;
-    */
     
     int bigX= x+ SPRITE_WIDTH -1;
     int bigY= y+SPRITE_HEIGHT -1;
@@ -474,19 +391,10 @@ bool StudentWorld::damageDamagable( int x, int y)
     return b;
 }
 
-
-
-
-
  bool StudentWorld::isIntersectingSolid(int x, int y)
     {
      
-     
-     
     vector<Actor*>::iterator it;
-     
-     
-  
      
     // if shareSpace then call the function's doSomething method
     for( it= actors.begin(); it!=actors.end(); it++)
@@ -540,15 +448,6 @@ bool StudentWorld::damageDamagable( int x, int y)
             }
 
         }
-         
-         
-       /* if( (*peach).getX() >= SPRITE_WIDTH-1 && (*peach).getX() <= x &&( *peach).getY() >= y+SPRITE_HEIGHT-1 && (*peach).getY() <=y)
-        {
-            return true;
-        }
-       // it++;
-        }*/
-        
     
     }
      return false;
@@ -592,6 +491,27 @@ int StudentWorld::peachX()
 int StudentWorld::peachY()
 {
     return peach->getY();
+}
+
+void StudentWorld::addHitPts(int x)
+{
+    peach->addHitPts(x);
+}
+int StudentWorld::getHitPts()
+{
+    return peach->getHitPts();
+}
+void StudentWorld::setMushroomPower(bool b)
+{
+    peach->setMushroomPower(b);
+}
+void StudentWorld::setFlowerPower(bool b)
+{
+    peach->setFlowerPower( b);
+}
+void StudentWorld::setStarPower(bool b)
+{
+    peach->setStarPower(b);
 }
 
 void StudentWorld::damagePeach()

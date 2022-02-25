@@ -3,18 +3,6 @@
 
 // Students:  Add code to this file, Actor.h, StudentWorld.h, and StudentWorld.cpp
 
-/*   Actor( bool status, bool canDamage, bool canShareSpace);
- virtual ~Actor();
- bool getStatus();
- bool damagable();
- bool shareSpace();
- virtual void doSomething()=0;
- virtual void bonk()=0;
- 
-private:
- bool m_status; // alive is true
- bool m_canDamage;*/
-
 
 //ACTOR CLASS
 Actor::Actor( bool status, bool canBeDamaged, bool canShareSpace, int imageID, int startX ,int startY, int direction, int depth, double size, StudentWorld* world): GraphObject( imageID,  startX,  startY, direction, depth, size)
@@ -27,11 +15,14 @@ Actor::Actor( bool status, bool canBeDamaged, bool canShareSpace, int imageID, i
     m_falling= false;
     
 }
+
+//Destructor
 Actor::~Actor()
 {
     
 }
 
+//Properties of Actor
 bool Actor::canGetBonked()
 {
     return true; 
@@ -42,6 +33,10 @@ bool  Actor::getStatus()
 }
 
 bool Actor::canFire()
+{
+    return false;
+}
+bool Actor::isProjectile()
 {
     return false;
 }
@@ -60,6 +55,18 @@ bool Actor::isFalling()
     return m_falling;
 }
 
+int Actor::getFiringDelay()
+{
+    return m_firing_delay;
+}
+bool Actor::createsShell()
+{
+    return false;
+}
+
+
+
+//sets Actor properties
 void Actor::setFalling( bool f)
 {
     m_falling = f;
@@ -75,17 +82,10 @@ void Actor::setFiringDelay(int x)
     m_firing_delay= m_firing_delay + x;
 }
 
-int Actor::getFiringDelay()
-{
-    //std::cerr <<m_firing_delay<< std::endl;
-    return m_firing_delay;
-}
 
-bool Actor::isProjectile()
-{
-    return false;
-}
 
+
+// Actor movement
 void Actor::fall()
 {
     if( !(getWorld()->isIntersectingSolid(getX(), getY()-2)))
@@ -104,9 +104,6 @@ void Actor::fall()
         {
             moveTo(getX()+2, getY());
         }
-       
-        
-        
     }
      else
      {
@@ -123,18 +120,9 @@ void Actor::fall()
      }
 }
 
-void Actor::setPause(bool f)
-{
-    
-}
-
-bool Actor::createsShell()
-{
-    return false;
-}
 
 
-
+// StudentWorld Pointer Accessor
 
 StudentWorld* Actor::getWorld( )
 {
@@ -142,14 +130,10 @@ StudentWorld* Actor::getWorld( )
 }
 
 
-
-
-
 //ENEMY CLASS
 Enemy::Enemy(int startX, int startY, StudentWorld* world, int imageID, int direction): Actor(true, true, true, imageID, startX, startY, direction, 0,1 , world)
 {
     m_direction= direction;
-    paused= false;
 }
 
 Enemy::~Enemy()
@@ -222,36 +206,17 @@ void Enemy::doSomething()
             }
             
         }
+  
+}
 
-                
+void Enemy::bonk()
+{
    
     
 }
 
-int Enemy::bonk()
-{
-    return 1;
-    
-}
 
-bool Enemy::pause()
-{
-    return paused;
-}
-
-void Enemy::setPause( bool p)
-{
-    paused= p;
-}
-
-bool Enemy::createsShell()
-{
-    return false;
-}
-
-
-
-
+//GOOMBA METHODS
 Goomba::Goomba( int startX, int startY, StudentWorld* world, int imageID, int direction): Enemy(  startX, startY, world, imageID, direction)
 {
     
@@ -266,10 +231,9 @@ void Goomba::doSomething()
 {
 
     Enemy::doSomething();
-    //std::cerr<< "DOES SOMETHING"<< std::endl;
 }
 
-
+//KOOPA METHODS
 Koopa::Koopa( int startX, int startY, StudentWorld* world, int imageID, int direction): Enemy(  startX, startY, world, imageID, direction)
 {
     
@@ -296,7 +260,7 @@ void Koopa::doSomething()
 }
 
 
-
+//PIRANHA METHODS
 Piranha::Piranha(int startX, int startY, StudentWorld* world, int imageID, int direction):Enemy(  startX, startY, world, imageID, direction)
 {
     m_firing_delay = 0;
@@ -345,12 +309,9 @@ void Piranha::doSomething()
     }
     if(getFiringDelay()==0)
     {
-        //std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
     }
     if(getFiringDelay() >0)
     {
-        
-        //std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
         setFiringDelay(-1);
         return;
     }
@@ -363,7 +324,6 @@ void Piranha::doSomething()
        
         
     }
-   // std::cerr << "PIRANHA DO SMTH PLEASE" << getFiringDelay()<< std::endl;
      
 }
 
@@ -373,13 +333,6 @@ bool Piranha::canFire()
     
 }
 
-
-
-int Piranha::bonk()
-{
-    
-    return 1;
-}
 
 void Piranha::setFiringDelay(int x)
 {
@@ -393,7 +346,7 @@ int Piranha::getFiringDelay()
 
 
 
-
+//GOODIE CLASS
 Goodie::Goodie( int startX, int startY, StudentWorld* world, int imageID):Actor( true, false, true, imageID, startX, startY, 0,1,1,world)
 {
     
@@ -444,7 +397,7 @@ void Goodie::doSomething()
     }
     
 
-
+//MUSHROOM METHODS
 Mushroom::Mushroom(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_MUSHROOM)
 {
     
@@ -455,11 +408,24 @@ Mushroom::~Mushroom()
     
 }
 
-int Mushroom::bonk()
+void Mushroom::bonk()
 {
-    return 6;
+
+    setStatus(false);
+    getWorld()->increaseScore(75);
+    if( getWorld()->getHitPts()==1)
+    {
+        getWorld()->addHitPts(1);
+    }
+   
+    getWorld()->setMushroomPower(true);
+    
+    getWorld()->playSound(SOUND_PLAYER_POWERUP);
+    
 }
 
+
+//FLOWER METHODS
 Flower::Flower(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_FLOWER)
 {
     
@@ -470,11 +436,21 @@ Flower::~Flower()
     
 }
 
-int Flower::bonk()
+void Flower::bonk()
 {
-    return 7;
-}
+
+    setStatus(false);
+    getWorld()->increaseScore(50);
+    if( getWorld()->getHitPts()==1)
+    {
+        getWorld()->addHitPts(1);
+    }
+    getWorld()->setFlowerPower(true);
+    getWorld()->playSound(SOUND_PLAYER_POWERUP);
     
+}
+  
+//STAR METHODS
 Star::Star(int startX, int startY, StudentWorld* world):Goodie(startX, startY, world, IID_STAR)
 {
         
@@ -485,9 +461,18 @@ Star::~Star()
         
 }
 
-int Star::bonk()
+void Star::bonk()
 {
-    return 9;
+    setStatus(false);
+    getWorld()->increaseScore(100);
+    
+    if( getWorld()->getHitPts()==1)
+    {
+        getWorld()->addHitPts(1);
+    }
+    getWorld()->setStarPower(true);
+    getWorld()->playSound(SOUND_PLAYER_POWERUP);
+    
 }
 
 
@@ -514,7 +499,7 @@ void Flag::doSomething()
     
 }
 
-int Flag::bonk()
+void Flag::bonk()
 {
     if(getStatus())
     {
@@ -525,8 +510,7 @@ int Flag::bonk()
        
        
     }
-    std::cerr << getWorld()->getScore() << std::endl;
-    return 8;
+    
    
 }
 
@@ -539,15 +523,16 @@ Mario::~Mario()
     
 }
 
-int Mario::bonk()
+void Mario::bonk()
 {
     if(getStatus())
     {
         getWorld()->increaseScore(1000);
         setStatus(false);
+        getWorld()->playSound(SOUND_GAME_OVER);
        
     }
-    return 3;
+    
 }
 void Mario::doSomething()
 {
@@ -592,10 +577,10 @@ PiranhaFireball::~PiranhaFireball()
     
 }
 
-int PiranhaFireball::bonk()
+void PiranhaFireball::bonk()
 {
     
-    return 1;
+    
 }
 
     void PiranhaFireball::doSomething()
@@ -643,9 +628,9 @@ void KoopaShell::doSomething()
     
 }
 
-int KoopaShell::bonk()
+void KoopaShell::bonk()
 {
-    return 10;
+    
 }
 
 PeachFireball::PeachFireball( int startX, int startY, StudentWorld* world, int direction):Projectiles( startX, startY,world, IID_PEACH_FIRE, direction)
@@ -664,7 +649,7 @@ void PeachFireball::doSomething()
     }
     bool b= getWorld()->damageDamagable(getX(), getY());
     if(b)
-    {//std::cerr << "created"<<std::endl;
+    {
        
         setStatus(false);
         return;
@@ -672,9 +657,9 @@ void PeachFireball::doSomething()
     Projectiles::doSomething();
 }
 
-int PeachFireball::bonk()
+void PeachFireball::bonk()
 {
-    return 11;
+   
 }
 
 
@@ -695,14 +680,14 @@ void Pipe::doSomething()
     
 }
 
-int Pipe::bonk()
+void Pipe::bonk()
 {
    
 
 
         getWorld()->playSound(SOUND_PLAYER_BONK);
         
-    return 2;
+   
 }
 
 
@@ -725,7 +710,7 @@ void Block::doSomething()
     
 }
 
-int Block::bonk()
+void Block::bonk()
 {
     if( m_contains_Power)
     {
@@ -735,20 +720,20 @@ int Block::bonk()
         {
             Mushroom *m= new Mushroom(getX(), getY()+8, getWorld());
             getWorld()->addToVector(m);
-            return 3;
+           
         }
         if(m_power== 's')
         {
             Star *s= new Star(getX(), getY()+8, getWorld());
             getWorld()->addToVector(s);
-            return 4;
+           
         }
         if(m_power== 'f')
         {
             Flower *f= new Flower(getX(),getY()+8, getWorld());
             getWorld()->addToVector(f);
             
-            return 5;
+           
         }
        
         
@@ -760,7 +745,7 @@ int Block::bonk()
        
         
     }
-    return 2;
+   
 }
     
 
@@ -791,11 +776,11 @@ Peach::Peach( int startX, int startY, StudentWorld* world): Actor(true, true, tr
 
 Peach::~Peach()
 {
-    //delete [] m_powers;
+  
 }
-int Peach::bonk()
+void Peach::bonk()
 {
-    return 0;
+    
 }
 
  
@@ -920,7 +905,7 @@ void Peach::doSomething()
     }
     if ( getFiringDelay()>0)
     {
-       // std::cerr <<getFiringDelay()<<"FIRING DELAY"<< std::endl;
+
         setFiringDelay(-1);
     }
     
@@ -930,7 +915,6 @@ void Peach::doSomething()
     {
        
         invincible_time--;
-       // std::cerr<< invincible_time << std::endl;
         if( invincible_time <= 0)
         {
             m_invincible= false;
@@ -1020,13 +1004,7 @@ void Peach::doSomething()
            
     case KEY_PRESS_UP:
              
-             /*if(getWorld()->isIntersectingSolid(getX() , getY()+4))
-             {
-                 (*getWorld()).playSound(SOUND_PLAYER_BONK);
-                break;
-             }
-             moveTo(getX(), getY()+4);
-              */
+           
              if( getWorld()->isIntersectingSolid(getX() , getY()-1))
              {
                  m_jumping = true;
@@ -1040,7 +1018,7 @@ void Peach::doSomething()
                  getWorld()->playSound(SOUND_PLAYER_JUMP);
                  if(getWorld()->isIntersectingSolid(getX() , getY()+4))
                  {
-                     //std::cerr << "should bonk rn" << std::endl;
+                    
                      getWorld()->peachBonk(getX() , getY()+4);
                      
                  }
@@ -1057,8 +1035,7 @@ void Peach::doSomething()
              }
              if ( getFiringDelay()>0)
              {
-                 //std::cerr <<getFiringDelay()<<"FIRING DELAY"<< std::endl;
-                 //setFiringDelay(-1);
+                 
                  break;
              }
              else
@@ -1082,17 +1059,7 @@ void Peach::doSomething()
              }
              break;
              
-             
-   /* case KEY_PRESS_DOWN:
-             if(getWorld()->isIntersectingSolid(getX() , getY()-4))
-             {
-                break;
-             }
-             moveTo(getX(), getY()-4);
-             break;*/
-             
-    
-             
+            
              
      }
          
@@ -1100,201 +1067,5 @@ void Peach::doSomething()
      }
     
     
-    
-  
-    
-    /*
-    Peach must check to see if she is currently alive. If not, then Peach’s
-    doSomething() method must return immediately – none of the following steps
-    should be performed.
-    2. Peach must check if she is currently invincible (Star Power), and if so, decrement
-    the number of remaining game ticks before she loses this invincibility power. If
-    this tick count reaches zero, Peach must set her invincibility status to off.
-    3. Peach must check if she is currently temporarily invincible, and if so, decrement
-    the number of remaining game ticks before she loses temporary invincibility. If
-    this tick count reaches zero, Peach must set her temporary invincibility status to
-    false. (Peach gains temporary invincibility if she overlaps with an enemy while
-    she has Jump Power or Fire Power.)
-    4. Peach must check if she is currently in “recharge” mode before she can fire again.
-    If the number of time_to_recharge_before_next_fire ticks is greater than zero, she
-    must decrement this tick count by one. If the tick count reaches zero, then Peach
-    may again shoot a fireball (if she has Shoot Power).
-    
-    
-    */
-    
-    
-    
-    
-    /*
-    if( !getStatus())
-    {
-        return;
-    }
-    if( m_invincible)
-    {
-        invincible_time--;
-        if( invincible_time== 0)
-        {
-            m_invincible= false;
-            m_powers[2]= 0;
-        }
-    }
-    
-     */
-    
-    
-    
-    
-    
-    
 }
 
-/*
- For the purposes of this project, to determine if two objects A and B overlap, simply
- check to see if their bounding squares overlap. Each object in the game (e.g., a block,
- koopa, Peach, goodies, pipes, fireballs) is represented by a rectangle that is
- SPRITE_WIDTH pixels wide and SPRITE_HEIGHT pixels high. Each object's location
- is denoted by the coordinates of the bottom-left corner of that rectangle. So if an object is
- at location (x,y), it will extend to (x+SPRITE_WIDTH−1, y+SPRITE_HEIGHT−1). It is
- therefore a pretty trivial problem to check if two boxes have any overlap with a few if
- statements. These constants are defined in GameConstants.h.
- */
-/*
-1. Peach must check to see if she is currently alive. If not, then Peach’s
-doSomething() method must return immediately – none of the following steps
-should be performed.
-2. Peach must check if she is currently invincible (Star Power), and if so, decrement
-the number of remaining game ticks before she loses this invincibility power. If
-this tick count reaches zero, Peach must set her invincibility status to off.
-3. Peach must check if she is currently temporarily invincible, and if so, decrement
-the number of remaining game ticks before she loses temporary invincibility. If
-this tick count reaches zero, Peach must set her temporary invincibility status to
-false. (Peach gains temporary invincibility if she overlaps with an enemy while
-she has Jump Power or Fire Power.)
-4. Peach must check if she is currently in “recharge” mode before she can fire again.
-If the number of time_to_recharge_before_next_fire ticks is greater than zero, she
-must decrement this tick count by one. If the tick count reaches zero, then Peach
-may again shoot a fireball (if she has Shoot Power)
-5. Peach must check to see if she currently overlaps with any other game object1
-(e.g., an enemy, a fireball, a flag, etc.) and if so, she must “bonk” the other object.
-What happens when you bonk another object? It depends on what’s being bonked;
-each class should have its own unique bonk() method that reacts appropriately.
-6. If Peach had previously initiated a jump and her remaining_jump_distance is > 0,
-then she will try to move upward by four pixels during the current tick:
-a. Peach will calculate her target x,y position first (in this case, four pixels
-greater than her current y position)
-b. Peach will check to see if there is an object that blocks movement at this
-destination position (before moving there). If so:
-i. Peach will bonk the target object that is blocking her way (e.g.,
-cause a bonk() method in the target object to be called)
-ii. Peach will abort trying to move to the destination square since it is
-blocked
-iii. Peach will update her remaining_jump_distance to zero such that
-the jump will be aborted and she will no longer try to move
-upward on the next tick.
-c. Otherwise if there is not a blocking object above Peach:
-i. Peach will use the moveTo() function from GraphObject to update
-her location 4 pixels upward.
-ii. Peach must decrement her remaining_jump_distance by 1 to
-indicate that she is now one step closer to reaching the top of her
-jump.
-7. Otherwise, if Peach was not actively jumping during the current tick, then she
-must check to see if she is falling:
-a. Peach must check if there is an object that blocks movement between 0
-and 3 (inclusive) pixels directly below her.
-b. If not, then Peach must update her y position by -4 pixels (so she is falling
-downward) using GraphObject’s moveTo() function.
-8. Next, Peach must check to see if the player pressed a keystroke using the
-getKey() function.
-9. If the user pressed a key:
-a. If the pressed key was KEY_PRESS_LEFT then Peach must:
-i. Set her direction to 180 degrees
-ii. Peach will calculate a target x,y position first (4 pixels less than
-her current x position)
-iii. Peach will check to see if there is an object that blocks movement
-at this destination position (before moving there). If so:
-1. Peach will bonk the target object that is blocking her way
-(e.g., cause a bonk() method in the target object to be
-called)
-2. Peach will abort trying to move to the destination square
-since it is blocked
-iv. Otherwise, Peach will update her location 4 pixels leftward.
-b. If the pressed key was KEY_PRESS_RIGHT then Peach must:
-i. Set her direction to 0 degrees
-ii. Peach will calculate a target x,y position first (4 pixels greater than
-her current x position)
-iii. Peach will check to see if there is an object that blocks movement
-at this destination position (before moving there). If so:
-1. Peach will bonk the target object that is blocking her way
-(e.g., cause a bonk() method in the target object to be
-called)
-2. Peach will abort trying to move to the destination square
-since it is blocked
-iv. Otherwise, Peach will update her location 4 pixels rightward.
-c. If the pressed key was KEY_PRESS_UP then Peach must:
-i. Check to see if there is an object that would block movement one
-pixel below her. (Such an object gives her support to jump; she
-doesn't actually move downward.) If so:
-1. Peach must set her remaining_jump_distance to the
-appropriate value:
-a. If Peach does NOT have Jump Power, then set
-remaining_jump_distance to 8.
-b. If Peach DOES have Jump Power, then set
-remaining_jump_distance to 12.
-2. Peach must play the sound SOUND_PLAYER_JUMP
-using the playSound() method in the GameWorld class.
-d. If the pressed key was the KEY_PRESS_SPACE bar key, then:
-i. If Peach doesn’t have Shoot Power, then do nothing
-ii. Otherwise, if the time_to_recharge_before_next_fire is greater
-than zero, then do nothing.
-iii. Otherwise:
-1. Play the sound SOUND_PLAYER_FIRE using the
-playSound() method in the GameWorld class.
-2. Set time_to_recharge_before_next_fire to 8, meaning that
-Peach may not fire again for another 8 game ticks
-3. Determine the x,y position directly in front of Peach that is
-4 pixels away in the direction she’s facing.
-4. Introduce a new fireball object at this location into your
-StudentWorld. The fireball must have its direction set to the
-same direction that Peach was facing when she fired.
- iv. Otherwise, Peach will update her location 4 pixels leftward.
- b. If the pressed key was KEY_PRESS_RIGHT then Peach must:
- i. Set her direction to 0 degrees
- ii. Peach will calculate a target x,y position first (4 pixels greater than
- her current x position)
- iii. Peach will check to see if there is an object that blocks movement
- at this destination position (before moving there). If so:
- 1. Peach will bonk the target object that is blocking her way
- (e.g., cause a bonk() method in the target object to be
- called)
- 2. Peach will abort trying to move to the destination square
- since it is blocked
- iv. Otherwise, Peach will update her location 4 pixels rightward.
- c. If the pressed key was KEY_PRESS_UP then Peach must:
- i. Check to see if there is an object that would block movement one
- pixel below her. (Such an object gives her support to jump; she
- doesn't actually move downward.) If so:
- 1. Peach must set her remaining_jump_distance to the
- appropriate value:
- a. If Peach does NOT have Jump Power, then set
- remaining_jump_distance to 8.
- b. If Peach DOES have Jump Power, then set
- remaining_jump_distance to 12.
- 2. Peach must play the sound SOUND_PLAYER_JUMP
- using the playSound() method in the GameWorld class.
- d. If the pressed key was the KEY_PRESS_SPACE bar key, then:
- i. If Peach doesn’t have Shoot Power, then do nothing
- ii. Otherwise, if the time_to_recharge_before_next_fire is greater
- than zero, then do nothing.
- iii. Otherwise:
- 1. Play the sound SOUND_PLAYER_FIRE using the
- playSound() method in the GameWorld class.
- 2. Set time_to_recharge_before_next_fire to 8, meaning that
- Peach may not fire again for another 8 game ticks
- 3. Determine the x,y position directly in front of Peach that is
- 4 pixels away in the direction she’s facing.
- 4. Introduce a new fireball object at this location into your
- StudentWorld. The fireball must have its direction set to the
- same direction that Peach was facing when she fired.
-*/
